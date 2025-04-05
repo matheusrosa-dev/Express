@@ -1,18 +1,17 @@
-import { pool } from "../config/db";
-import { IMigration } from "./interfaces";
+import path from "path";
+import { pool } from "../../../config/db";
+import { IMigration } from "../../interfaces";
+import { readFile } from "fs/promises";
 
-export class CreatePurchasesTable implements IMigration {
+class CreatePurchasesTable implements IMigration {
   migrationName = "create_purchases_table";
 
   async up() {
     try {
-      await pool.query(`CREATE TABLE purchases (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        user_id INT NOT NULL,
-        total_price DECIMAL(10, 2) NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-      );`);
+      const sqlPath = path.join(__dirname, "up.sql");
+      const sql = await readFile(sqlPath, "utf8");
+
+      await pool.query(sql);
 
       console.log(`Migration '${this.migrationName}' is up.`);
     } catch (error) {
@@ -24,7 +23,10 @@ export class CreatePurchasesTable implements IMigration {
 
   async down() {
     try {
-      await pool.query(`DROP TABLE purchases;`);
+      const sqlPath = path.join(__dirname, "down.sql");
+      const sql = await readFile(sqlPath, "utf8");
+
+      await pool.query(sql);
       console.log(`Migration '${this.migrationName}' is down.`);
     } catch (error) {
       throw new Error(

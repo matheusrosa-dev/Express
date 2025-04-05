@@ -1,17 +1,12 @@
-import CreateMigrationsTable from "./create_migrations_table";
-import CreateProductsTable from "./create_products_table";
-import CreateUsersTable from "./create_users_table";
+import CreateMigrationsTable from "./scripts/create_migrations_table";
+
+import { migrations } from "./scripts";
+
 import { Migration } from "./entities";
 import { MigrationModel } from "./models";
 import { MigrationsRepository } from "./repositories";
 
 type Action = "up" | "down";
-
-const migrations = [
-  CreateMigrationsTable,
-  CreateProductsTable,
-  CreateUsersTable,
-];
 
 const migrationModel = new MigrationModel();
 const migrationRepository = new MigrationsRepository(migrationModel);
@@ -50,42 +45,51 @@ const runDownMigration = async (migration: (typeof migrations)[number]) => {
   await migrationRepository.delete(migrationId!);
 };
 
-const runMigrations = async (action: Action, migrationName?: string) => {
+const runAllMigrations = async (action: Action) => {
   try {
-    if (!migrationName) {
-      if (action === "down") {
-        migrations.reverse();
-      }
-
-      for (const migration of migrations) {
-        if (action === "up") {
-          await runUpMigration(migration);
-        }
-
-        if (action === "down") {
-          await runDownMigration(migration);
-          continue;
-        }
-      }
-
-      return;
+    if (action === "down") {
+      migrations.reverse();
     }
 
-    if (migrationName) {
-      const foundMigration = migrations.find(
-        (migration) => migration.migrationName === migrationName
-      );
-
-      if (!foundMigration) {
-        throw new Error(`Migration ${migrationName} not found`);
+    for (const migration of migrations) {
+      if (action === "up") {
+        await runUpMigration(migration);
       }
 
-      await foundMigration[action]();
+      if (action === "down") {
+        await runDownMigration(migration);
+        continue;
+      }
     }
   } catch (error) {
     console.log(error);
-  } finally {
-    process.exit();
+  }
+};
+
+const runMigrationByName = async (props: {
+  action: Action;
+  migrationName: string;
+}) => {
+  const { action, migrationName } = props;
+
+  try {
+    const foundMigration = migrations.find(
+      (migration) => migration.migrationName === migrationName
+    );
+
+    if (!foundMigration) {
+      throw new Error(`Migration ${migrationName} not found`);
+    }
+
+    if (action === "up") {
+      await runUpMigration(foundMigration);
+    }
+
+    if (action === "down") {
+      await runDownMigration(foundMigration);
+    }
+  } catch (error) {
+    console.log(error);
   }
 };
 
@@ -99,4 +103,21 @@ if (!hasAction) {
   throw new Error(`Invalid action`);
 }
 
-runMigrations(action, migrationName);
+(async () => {
+  if (action === "up") {
+    await CreateMigrationsTable.up();
+  }
+
+  if (migrationName) {
+    await runMigrationByName({ action, migrationName });
+    process.exit();
+  }
+
+  await runAllMigrations(action);
+
+  if (action === "down") {
+    await CreateMigrationsTable.down();
+  }
+
+  process.exit();
+})();
