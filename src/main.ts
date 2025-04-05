@@ -1,8 +1,12 @@
 import express from "express";
-import "./migrations/synchronize";
+import dotenv from "dotenv";
+import { runSynchonizeMigrations } from "./migrations/synchronize";
 
+dotenv.config();
 const app = express();
-const PORT = 3333;
+const PORT = process.env.PORT;
+
+if (process.env.SYNCHRONIZE === "TRUE") runSynchonizeMigrations();
 
 // app.get("/", (req, res) => {
 //   res.send("Hello, Express com TypeScript");

@@ -1,5 +1,4 @@
 import { migrations } from "./scripts";
-
 import { Migration } from "./entities";
 import { MigrationModel } from "./models";
 import { MigrationsRepository } from "./repositories";
@@ -8,7 +7,7 @@ import CreateMigrationsTable from "./scripts/create_migrations_table";
 const migrationModel = new MigrationModel();
 const migrationRepository = new MigrationsRepository(migrationModel);
 
-const runMigrations = async () => {
+export const runSynchonizeMigrations = async () => {
   try {
     await CreateMigrationsTable.up();
 
@@ -28,7 +27,7 @@ const runMigrations = async () => {
     }
   } catch (error) {
     console.log(error);
+  } finally {
+    process.exit();
   }
 };
-
-runMigrations();
