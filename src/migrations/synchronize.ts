@@ -27,7 +27,5 @@ export const runSynchonizeMigrations = async () => {
     }
   } catch (error) {
     console.log(error);
-  } finally {
-    process.exit();
   }
 };

@@ -8,9 +8,9 @@ const PORT = process.env.PORT;
 
 if (process.env.SYNCHRONIZE === "TRUE") runSynchonizeMigrations();
 
-// app.get("/", (req, res) => {
-//   res.send("Hello, Express com TypeScript");
-// });
+app.get("/", (req, res) => {
+  res.send("Hello, Express com TypeScript");
+});
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
