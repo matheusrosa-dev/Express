@@ -7,7 +7,10 @@ const app = express();
 const PORT = process.env.PORT;
 
 app.use(express.json());
-app.use("/products", productsController);
+// app.use("/products", productsController);
+app.get("/products", (req, res) => {
+  res.send("Hello World!");
+});
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
