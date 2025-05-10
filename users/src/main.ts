@@ -7,8 +7,8 @@ const app = express();
 const PORT = process.env.PORT;
 
 app.use(express.json());
-app.use("/users", usersController);
+app.use("/", usersController);
 
 app.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
+  console.log(`Users service is running on port ${PORT}`);
 });

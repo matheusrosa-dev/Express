@@ -7,11 +7,8 @@ const app = express();
 const PORT = process.env.PORT;
 
 app.use(express.json());
-// app.use("/products", productsController);
-app.get("/products", (req, res) => {
-  res.send("Hello World!");
-});
+app.use("/", productsController);
 
 app.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
+  console.log(`Products service is running on port ${PORT}`);
 });

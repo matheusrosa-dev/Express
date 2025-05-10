@@ -1,9 +1,13 @@
-FROM nginx
+FROM node:22
 
-RUN rm /etc/nginx/conf.d/default.conf
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+WORKDIR /app
 
-EXPOSE 80
+COPY . .
 
-ENTRYPOINT [ "/docker-entrypoint.sh" ]
-CMD [ "nginx", "-g", "daemon off;" ]
+RUN npm install
+
+RUN npm run build
+
+EXPOSE 3333
+
+CMD ["npm", "run", "start"]

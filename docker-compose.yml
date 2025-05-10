@@ -1,0 +1,46 @@
+services:
+  proxy-gateway:
+    build: ./proxy-gateway
+    container_name: proxy-gateway
+    networks:
+      - microservices
+    ports:
+      - 3333:3333
+
+  db-products:
+    image: mysql:8.0-debian
+    container_name: db-products
+    environment:
+      - MYSQL_DATABASE=products
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      - microservices
+
+  api-products:
+    build:
+      context: ./products
+    entrypoint: dockerize -wait tcp://db-products:3306 -timeout 20s ./docker-entrypoint.sh npm run start
+    container_name: api-products
+    networks:
+      - microservices
+
+  db-users:
+    image: mysql:8.0-debian
+    container_name: db-users
+    environment:
+      - MYSQL_DATABASE=users
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      - microservices
+
+  api-users:
+    build:
+      context: ./users
+    entrypoint: dockerize -wait tcp://db-users:3306 -timeout 20s ./docker-entrypoint.sh npm run start
+    container_name: api-users
+    networks:
+      - microservices
+
+networks:
+  microservices:
+    driver: bridge

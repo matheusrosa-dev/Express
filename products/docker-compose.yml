@@ -1,17 +1,13 @@
 services:
-  # db:
-  #   image: mysql:8.0-debian
-  #   container_name: db-products
-  #   environment:
-  #     - MYSQL_DATABASE=products
-  #     - MYSQL_ROOT_PASSWORD=root
+  db:
+    image: mysql:8.0-debian
+    container_name: db-products
+    environment:
+      - MYSQL_DATABASE=products
+      - MYSQL_ROOT_PASSWORD=root
 
   api:
     build: .
     container_name: api-products
     networks:
       - microservices
-
-networks:
-  microservices:
-    driver: bridge
