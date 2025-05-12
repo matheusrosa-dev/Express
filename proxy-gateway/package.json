@@ -10,8 +10,7 @@
   "description": "",
   "dependencies": {
     "express": "^4.21.2",
-    "http-proxy-middleware": "^3.0.5",
-    "dotenv": "^16.4.7"
+    "http-proxy-middleware": "^3.0.5"
   },
   "devDependencies": {
     "@types/express": "^5.0.1",

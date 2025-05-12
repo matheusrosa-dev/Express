@@ -1,10 +1,9 @@
 import express from "express";
 import { createProxyMiddleware } from "http-proxy-middleware";
-import dotenv from "dotenv";
 
-dotenv.config();
 const app = express();
-const PORT = process.env.PORT;
+
+const API_PORT = 3333;
 
 app.use(
   "/products",
@@ -22,4 +21,6 @@ app.use(
   })
 );
 
-app.listen(PORT, () => console.log(`Proxy gateway is running on port ${PORT}`));
+app.listen(API_PORT, () =>
+  console.log(`Proxy gateway is running on port ${API_PORT}`)
+);

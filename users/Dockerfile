@@ -14,9 +14,3 @@ COPY . .
 RUN npm install
 
 RUN npm run build
-
-EXPOSE 3333
-
-ENTRYPOINT [ "./docker-entrypoint.sh" ]
-
-CMD ["npm", "run", "start"]
