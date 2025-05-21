@@ -21,6 +21,14 @@ app.use(
   })
 );
 
+app.use(
+  "/purchases",
+  createProxyMiddleware({
+    target: "http://api-purchases:3333",
+    changeOrigin: true,
+  })
+);
+
 app.listen(API_PORT, () =>
   console.log(`Proxy gateway is running on port ${API_PORT}`)
 );

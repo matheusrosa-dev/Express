@@ -1,0 +1,5 @@
+Adicionar DTO
+Adicionar CRON
+Adicionar MS de email
+Adicionar Redis
+Adicionar login?

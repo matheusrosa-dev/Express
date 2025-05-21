@@ -1,10 +1,10 @@
 import mysql from "mysql2/promise";
 
 export const pool = mysql.createPool({
-  host: "localhost",
-  port: 3307,
+  host: "db-purchases",
+  port: 3306,
   user: "root",
-  database: "purchases",
+  database: "db-purchases",
   password: "root",
   waitForConnections: true,
   connectionLimit: 10,

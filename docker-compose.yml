@@ -42,6 +42,23 @@ services:
     networks:
       - microservices
 
+  db-purchases:
+    image: mysql:8.0-debian
+    container_name: db-purchases
+    environment:
+      - MYSQL_DATABASE=db-purchases
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      - microservices
+
+  api-purchases:
+    build:
+      context: ./purchases
+    entrypoint: dockerize -wait tcp://db-purchases:3306 -timeout 20s ./docker-entrypoint.sh npm run start
+    container_name: api-purchases
+    networks:
+      - microservices
+
 networks:
   microservices:
     driver: bridge

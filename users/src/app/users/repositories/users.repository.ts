@@ -19,14 +19,14 @@ export class UsersRepository {
   }
 
   async findById(id: number) {
-    const foundUser = await this._usersModel.findById(id);
+    const foundUserModel = await this._usersModel.findById(id);
 
-    if (!foundUser) return null;
+    if (!foundUserModel) return null;
 
-    return {
-      ...foundUser,
-      createdAt: foundUser.created_at,
-    };
+    return new User({
+      ...foundUserModel,
+      createdAt: foundUserModel.created_at,
+    });
   }
 
   async create(user: User) {

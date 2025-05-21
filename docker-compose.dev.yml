@@ -11,6 +11,8 @@ services:
   db-products:
     image: mysql:8.0-debian
     container_name: db-products
+    ports:
+      - 3306:3306
     environment:
       - MYSQL_DATABASE=db-products
       - MYSQL_ROOT_PASSWORD=root
@@ -29,6 +31,8 @@ services:
   db-users:
     image: mysql:8.0-debian
     container_name: db-users
+    ports:
+      - 3307:3306
     environment:
       - MYSQL_DATABASE=db-users
       - MYSQL_ROOT_PASSWORD=root
@@ -41,6 +45,26 @@ services:
     container_name: api-users
     volumes:
       - ./users:/app
+    networks:
+      - microservices
+
+  db-purchases:
+    image: mysql:8.0-debian
+    container_name: db-purchases
+    ports:
+      - 3308:3306
+    environment:
+      - MYSQL_DATABASE=db-purchases
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      - microservices
+
+  api-purchases:
+    image: node:22
+    entrypoint: tail -f /dev/null
+    container_name: api-purchases
+    volumes:
+      - ./purchases:/app
     networks:
       - microservices
 
