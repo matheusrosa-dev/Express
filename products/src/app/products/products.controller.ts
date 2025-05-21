@@ -13,6 +13,11 @@ productsController.get("/", productsService.findAll.bind(productsService));
 
 productsController.post("/", productsService.create.bind(productsService));
 
+productsController.get(
+  "/:productId",
+  productsService.findById.bind(productsService)
+);
+
 productsController.put(
   "/:productId",
   productsService.update.bind(productsService)

@@ -17,6 +17,21 @@ export class PurchasesService {
     });
   }
 
+  async findById(req: Request, res: Response) {
+    const purchaseId = Number(req.params.purchaseId);
+
+    const foundPurchase = await this._purchasesRepository.findById(purchaseId);
+
+    if (!foundPurchase) {
+      res.status(404).send({ message: "Purchase not found", data: null });
+      return;
+    }
+
+    res.send({
+      data: foundPurchase.toJSON(),
+    });
+  }
+
   async create(req: Request, res: Response) {
     const purchase = new Purchase(req.body);
 

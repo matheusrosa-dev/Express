@@ -17,6 +17,21 @@ export class UsersService {
     });
   }
 
+  async findById(req: Request, res: Response) {
+    const userId = Number(req.params.userId);
+
+    const foundUser = await this._usersRepository.findById(userId);
+
+    if (!foundUser) {
+      res.status(404).send({ message: "User not found", data: null });
+      return;
+    }
+
+    res.send({
+      data: foundUser.toJSON(),
+    });
+  }
+
   async create(req: Request, res: Response) {
     const user = new User(req.body);
 

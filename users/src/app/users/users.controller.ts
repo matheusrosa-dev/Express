@@ -13,6 +13,8 @@ usersController.get("/", usersService.findAll.bind(usersService));
 
 usersController.post("/", usersService.create.bind(usersService));
 
+usersController.get("/:userId", usersService.findById.bind(usersService));
+
 usersController.delete("/:userId", usersService.delete.bind(usersService));
 
 export { usersController };

@@ -13,6 +13,11 @@ purchasesController.get("/", purchasesService.findAll.bind(purchasesService));
 
 purchasesController.post("/", purchasesService.create.bind(purchasesService));
 
+purchasesController.get(
+  "/:purchaseId",
+  purchasesService.findById.bind(purchasesService)
+);
+
 purchasesController.delete(
   "/:purchaseId",
   purchasesService.delete.bind(purchasesService)

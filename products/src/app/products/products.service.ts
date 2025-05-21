@@ -17,6 +17,21 @@ export class ProductsService {
     });
   }
 
+  async findById(req: Request, res: Response) {
+    const productId = Number(req.params.productId);
+
+    const foundProduct = await this._productsRepository.findById(productId);
+
+    if (!foundProduct) {
+      res.status(404).send({ message: "Product not found", data: null });
+      return;
+    }
+
+    res.send({
+      data: foundProduct.toJSON(),
+    });
+  }
+
   async create(req: Request, res: Response) {
     const product = new Product(req.body);
 
