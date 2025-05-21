@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { PurchasesRepository } from "./repositories";
 import { Purchase } from "./entities";
+import { productsServices, usersServices } from "../../shared/services";
 
 export class PurchasesService {
   private _purchasesRepository: PurchasesRepository;
@@ -33,13 +34,44 @@ export class PurchasesService {
   }
 
   async create(req: Request, res: Response) {
-    const purchase = new Purchase(req.body);
+    try {
+      const [user, product] = await Promise.all([
+        usersServices.findById(req.body.userId),
+        productsServices.findById(req.body.productId),
+      ]);
 
-    const newPurchase = await this._purchasesRepository.create(purchase);
+      const purchase = new Purchase({
+        amount: req.body.amount,
+        productId: product.id,
+        productName: product.name,
+        userId: user.id,
+        userName: user.name,
+      });
 
-    res.send({
-      data: newPurchase.toJSON(),
-    });
+      const newPurchase = await this._purchasesRepository.create(purchase);
+
+      res.send({
+        data: newPurchase.toJSON(),
+      });
+    } catch (e: any) {
+      const response: {
+        status?: number;
+        data?: {
+          message?: string;
+        };
+      } = e?.response;
+
+      if (response?.status && response?.data?.message) {
+        res
+          .status(response.status)
+          .send({ message: response.data.message, data: null });
+        return;
+      }
+
+      console.log(e);
+
+      res.status(500).send({ message: "Internal server error", data: null });
+    }
   }
 
   async delete(req: Request, res: Response) {
