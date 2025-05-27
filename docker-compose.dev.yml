@@ -3,14 +3,16 @@ services:
     build:
       context: ./proxy-gateway
     container_name: proxy-gateway
-    networks:
-      - microservices
     ports:
       - 3333:3333
+    networks:
+      - microservices
 
   db-products:
     image: mysql:8.0-debian
     container_name: db-products
+    ports:
+      - 3306:3306
     environment:
       - MYSQL_DATABASE=db-products
       - MYSQL_ROOT_PASSWORD=root
@@ -18,16 +20,19 @@ services:
       - microservices
 
   api-products:
-    build:
-      context: ./products
-    entrypoint: dockerize -wait tcp://db-products:3306 -timeout 20s ./docker-entrypoint.sh npm run start
+    image: node:22
+    entrypoint: tail -f /dev/null
     container_name: api-products
+    volumes:
+      - ./products:/app
     networks:
       - microservices
 
   db-users:
     image: mysql:8.0-debian
     container_name: db-users
+    ports:
+      - 3307:3306
     environment:
       - MYSQL_DATABASE=db-users
       - MYSQL_ROOT_PASSWORD=root
@@ -35,16 +40,19 @@ services:
       - microservices
 
   api-users:
-    build:
-      context: ./users
-    entrypoint: dockerize -wait tcp://db-users:3306 -timeout 20s ./docker-entrypoint.sh npm run start
+    image: node:22
+    entrypoint: tail -f /dev/null
     container_name: api-users
+    volumes:
+      - ./users:/app
     networks:
       - microservices
 
   db-purchases:
     image: mysql:8.0-debian
     container_name: db-purchases
+    ports:
+      - 3308:3306
     environment:
       - MYSQL_DATABASE=db-purchases
       - MYSQL_ROOT_PASSWORD=root
@@ -52,10 +60,11 @@ services:
       - microservices
 
   api-purchases:
-    build:
-      context: ./purchases
-    entrypoint: dockerize -wait tcp://db-purchases:3306 -timeout 20s ./docker-entrypoint.sh npm run start
+    image: node:22
+    entrypoint: tail -f /dev/null
     container_name: api-purchases
+    volumes:
+      - ./purchases:/app
     networks:
       - microservices
 
