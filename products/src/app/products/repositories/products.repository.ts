@@ -25,7 +25,7 @@ export class ProductsRepository {
       name: data.name,
       description: data.description,
       price: data.price,
-      amount: data.amount,
+      stock: data.stock,
     });
 
     return new Product({ ...model, createdAt: model.created_at });
@@ -49,7 +49,7 @@ export class ProductsRepository {
       name: data.name,
       price: data.price,
       description: data.description,
-      amount: data.amount,
+      stock: data.stock,
     });
 
     return new Product({

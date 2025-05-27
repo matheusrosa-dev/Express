@@ -28,4 +28,9 @@ productsController.delete(
   productsService.delete.bind(productsService)
 );
 
+productsController.put(
+  "/:productId/decrement",
+  productsService.decrementStock.bind(productsService)
+);
+
 export { productsController };

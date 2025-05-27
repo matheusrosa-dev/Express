@@ -5,7 +5,7 @@ interface IProductModelProps {
   name: string;
   description?: string;
   price: number;
-  amount: number;
+  stock: number;
   created_at: Date;
 }
 

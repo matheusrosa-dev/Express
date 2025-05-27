@@ -64,6 +64,34 @@ export class ProductsService {
     });
   }
 
+  async decrementStock(req: Request, res: Response) {
+    const productId = Number(req.params.productId);
+
+    const amount = req.body.amount as number;
+
+    const product = await this._productsRepository.findById(productId);
+
+    if (!product) {
+      res.status(404).send({ message: "Product not found", data: null });
+      return;
+    }
+
+    if (product.toJSON().stock === 0) {
+      res
+        .status(400)
+        .send({ message: "Product stock is not enough", data: null });
+      return;
+    }
+
+    product.decrementStock(amount);
+
+    const updatedProduct = await this._productsRepository.update(product);
+
+    res.send({
+      data: updatedProduct.toJSON(),
+    });
+  }
+
   async delete(req: Request, res: Response) {
     const productId = Number(req.params.productId);
 

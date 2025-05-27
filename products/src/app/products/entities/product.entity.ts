@@ -5,7 +5,7 @@ type ProductProps = {
   name: string;
   description?: string;
   price: number | string;
-  amount: number;
+  stock: number;
   createdAt?: Date;
 };
 
@@ -13,14 +13,14 @@ export class Product extends Entity {
   private _name: string;
   private _description?: string;
   private _price: number;
-  private _amount: number;
+  private _stock: number;
 
   constructor(props: ProductProps) {
     super(props);
 
     this._name = props.name;
     this._description = props?.description;
-    this._amount = props?.amount;
+    this._stock = props?.stock;
 
     if (typeof props.price === "string") {
       if (Number.isNaN(Number(props.price))) {
@@ -34,13 +34,17 @@ export class Product extends Entity {
     this._price = props.price;
   }
 
+  decrementStock(amount = 1) {
+    this._stock -= amount;
+  }
+
   toJSON() {
     return {
       id: this._id,
       name: this._name,
       description: this._description,
       price: this._price,
-      amount: this._amount,
+      stock: this._stock,
       createdAt: this._createdAt,
     };
   }

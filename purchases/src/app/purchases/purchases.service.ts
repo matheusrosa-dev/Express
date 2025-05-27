@@ -40,6 +40,18 @@ export class PurchasesService {
         productsServices.findById(req.body.productId),
       ]);
 
+      if (req.body.amount > product.stock) {
+        res
+          .status(400)
+          .send({ message: "Product stock is not enough", data: null });
+
+        return;
+      }
+
+      await productsServices.decrementStock(product.id, {
+        amount: req.body.amount,
+      });
+
       const purchase = new Purchase({
         amount: req.body.amount,
         productId: product.id,
