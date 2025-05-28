@@ -8,7 +8,7 @@ class CreateMigrationsTable implements IMigration {
 
   async up() {
     try {
-      const [rows]: any = await pool.execute("SHOW TABLES LIKE 'migrations'");
+      const [rows]: any = await pool.query("SHOW TABLES LIKE 'migrations'");
 
       if (rows?.length && Object.values(rows[0]).includes("migrations")) {
         return;

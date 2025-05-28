@@ -34,10 +34,6 @@ export class Product extends Entity {
     this._price = props.price;
   }
 
-  decrementStock(amount = 1) {
-    this._stock -= amount;
-  }
-
   toJSON() {
     return {
       id: this._id,

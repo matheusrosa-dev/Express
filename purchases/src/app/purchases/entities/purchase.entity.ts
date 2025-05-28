@@ -1,39 +1,32 @@
 import { Entity } from "../../../shared/classes";
+import { PurchaseItem } from "./purchase_item.entity";
 
 type PurchaseProps = {
   id?: number;
-  amount: number;
-  productId: number;
-  productName: string;
   userId: number;
   userName: string;
+  items: PurchaseItem[];
   createdAt?: Date;
 };
 
 export class Purchase extends Entity {
-  private _amount: number;
-  private _productId: number;
-  private _productName: string;
   private _userId: number;
   private _userName: string;
+  private _items: PurchaseItem[];
 
   constructor(props: PurchaseProps) {
     super(props);
-    this._amount = props.amount;
-    this._productId = props.productId;
-    this._productName = props.productName;
     this._userId = props.userId;
     this._userName = props.userName;
+    this._items = props.items;
   }
 
   toJSON() {
     return {
       id: this._id,
-      amount: this._amount,
-      productId: this._productId,
-      productName: this._productName,
       userId: this._userId,
       userName: this._userName,
+      items: this._items.map((item) => item.toJSON()),
       createdAt: this._createdAt,
     };
   }

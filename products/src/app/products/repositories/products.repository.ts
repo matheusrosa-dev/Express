@@ -42,6 +42,26 @@ export class ProductsRepository {
     });
   }
 
+  async findManyByIds(productIds: number[]) {
+    const foundProducts = await this._productsModel.findManyByIds(productIds);
+
+    if (!foundProducts) return [];
+
+    const products = foundProducts.map(
+      (product) =>
+        new Product({
+          id: product.id,
+          name: product.name,
+          description: product.description,
+          price: product.price,
+          stock: product.stock,
+          createdAt: product.created_at,
+        })
+    );
+
+    return products;
+  }
+
   async update(product: Product) {
     const data = product.toJSON();
 
@@ -60,5 +80,19 @@ export class ProductsRepository {
 
   async delete(productId: number) {
     await this._productsModel.delete(productId);
+  }
+
+  async decrementProductsStock(props: {
+    items: { productId: number; amount: number }[];
+  }) {
+    const models = await this._productsModel.decrementProductsStock(props);
+
+    return models.map(
+      (model) =>
+        new Product({
+          ...model,
+          createdAt: model.created_at,
+        })
+    );
   }
 }

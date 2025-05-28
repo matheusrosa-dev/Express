@@ -2,8 +2,9 @@ import { pool } from "../config/db";
 
 type CreateUpdateData<ModelProps> = Omit<Omit<ModelProps, "id">, "created_at">;
 
+//TODO: substituir query por execute
 export abstract class Model<ModelProps> {
-  private _tableName: string;
+  protected _tableName: string;
 
   constructor(tableName: string) {
     if (!tableName) {

@@ -1,6 +1,7 @@
 import { Response, Request } from "express";
 import { ProductsRepository } from "./repositories";
 import { Product } from "./entities";
+import { DecrementStockDto } from "./dtos";
 
 export class ProductsService {
   _productsRepository: ProductsRepository;
@@ -65,30 +66,49 @@ export class ProductsService {
   }
 
   async decrementStock(req: Request, res: Response) {
-    const productId = Number(req.params.productId);
+    const body = req.body as DecrementStockDto;
 
-    const amount = req.body.amount as number;
+    const productIds = body.items.map((item) => item.productId);
 
-    const product = await this._productsRepository.findById(productId);
+    const products = await this._productsRepository.findManyByIds(productIds);
 
-    if (!product) {
-      res.status(404).send({ message: "Product not found", data: null });
+    const notFoundProductIds = productIds.filter(
+      (productId) =>
+        !products.find((product) => product.toJSON().id === productId)
+    );
+
+    if (notFoundProductIds.length) {
+      res.status(404).send({
+        message: `Products with id [${notFoundProductIds.join(
+          ", "
+        )}] were not found`,
+        data: null,
+      });
       return;
     }
 
-    if (product.toJSON().stock === 0) {
-      res
-        .status(400)
-        .send({ message: "Product stock is not enough", data: null });
+    const notEnoughStockProductIds = this._validateProductStock({
+      items: body.items,
+      products,
+    });
+
+    if (notEnoughStockProductIds.length) {
+      res.status(400).send({
+        message: `Products with id [${notEnoughStockProductIds.join(
+          ", "
+        )}] do not have enough stock`,
+        data: null,
+      });
       return;
     }
 
-    product.decrementStock(amount);
-
-    const updatedProduct = await this._productsRepository.update(product);
+    const updatedProducts =
+      await this._productsRepository.decrementProductsStock({
+        items: body.items,
+      });
 
     res.send({
-      data: updatedProduct.toJSON(),
+      data: updatedProducts.map((product) => product.toJSON()),
     });
   }
 
@@ -105,5 +125,30 @@ export class ProductsService {
     await this._productsRepository.delete(productId);
 
     res.status(204).send();
+  }
+
+  private _validateProductStock(props: {
+    items: { productId: number; amount: number }[];
+    products: Product[];
+  }) {
+    const { items, products } = props;
+
+    const notEnoughStockProducts = items.filter((item) => {
+      const product = products
+        .find((product) => product.toJSON().id === item.productId)!
+        .toJSON();
+
+      if (product.stock < item.amount) {
+        return true;
+      }
+
+      return false;
+    });
+
+    const notEnoughStockProductIds = notEnoughStockProducts.map(
+      (item) => item.productId
+    );
+
+    return notEnoughStockProductIds;
   }
 }
