@@ -1,5 +1,9 @@
-Adicionar DTO
 Adicionar CRON
 Adicionar MS de email
 Adicionar Redis
 Adicionar login?
+Criar seeds
+Adicionar update em todos MS
+Adicionar dto em tudo
+remover promise all
+implementar soft delete

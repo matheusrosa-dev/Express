@@ -3,8 +3,7 @@ import { ProductsRepository } from "./repositories";
 import { ProductsModel } from "./models";
 import { ProductsService } from "./products.service";
 import { zodValidationMiddleware } from "../../middlewares";
-import { createProductSchema } from "./dtos";
-import { decrementStockSchema } from "./dtos/decrement-stock.dto copy";
+import { createProductSchema, decrementStockSchema } from "./dtos";
 
 const productsModel = new ProductsModel();
 const productsRepository = new ProductsRepository(productsModel);
@@ -20,6 +19,12 @@ productsController.post(
   productsService.create.bind(productsService)
 );
 
+productsController.put(
+  "/decrement",
+  zodValidationMiddleware(decrementStockSchema),
+  productsService.decrementStock.bind(productsService)
+);
+
 productsController.get(
   "/:productId",
   productsService.findById.bind(productsService)
@@ -33,12 +38,6 @@ productsController.put(
 productsController.delete(
   "/:productId",
   productsService.delete.bind(productsService)
-);
-
-productsController.put(
-  "/:productId/decrement",
-  zodValidationMiddleware(decrementStockSchema),
-  productsService.decrementStock.bind(productsService)
 );
 
 export { productsController };

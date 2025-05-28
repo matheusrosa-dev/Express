@@ -1,50 +1,100 @@
-import { Purchase } from "../entities";
+import { pool } from "../../../shared/config/db";
+import { Purchase, PurchaseItem } from "../entities";
 import { PurchasesModel } from "../models";
+import { PurchaseItemsRepository } from "./purchase_items.repository";
 
 export class PurchasesRepository {
   private _purchasesModel: PurchasesModel;
+  private _purchaseItemsRepository: PurchaseItemsRepository;
 
-  constructor(purchasesModel: PurchasesModel) {
+  constructor(
+    purchasesModel: PurchasesModel,
+    purchaseItemsRepository: PurchaseItemsRepository
+  ) {
     this._purchasesModel = purchasesModel;
+    this._purchaseItemsRepository = purchaseItemsRepository;
   }
 
-  async findAll() {
-    const purchases = await this._purchasesModel.findAll();
+  async findByUserId(userId: number) {
+    const purchasesModels = await this._purchasesModel.findByUserId(userId);
 
-    const entities = purchases.map(
-      (purchase) =>
-        new Purchase({
-          ...purchase,
-          productId: purchase.product_id,
-          productName: purchase.product_name,
-          userId: purchase.user_id,
-          userName: purchase.user_name,
-          createdAt: purchase.created_at,
-        })
-    );
+    const purchases = purchasesModels.map((purchase) => {
+      const purchaseItem = purchase.items.map(
+        (item) =>
+          new PurchaseItem({
+            id: item.id,
+            amount: item.amount,
+            productId: item.product_id,
+            purchaseId: item.purchase_id,
+            productName: item.product_name,
+            createdAt: item.created_at,
+          })
+      );
 
-    return entities;
+      return new Purchase({
+        id: purchase.id,
+        userId: purchase.user_id,
+        userName: purchase.user_name,
+        items: purchaseItem,
+        createdAt: purchase.created_at,
+      });
+    });
+
+    return purchases;
   }
 
   async create(purchase: Purchase) {
+    const poolConnection = await pool.getConnection();
+
     const data = purchase.toJSON();
 
-    const model = await this._purchasesModel.insert({
-      amount: data.amount,
-      product_id: data.productId,
-      product_name: data.productName,
-      user_id: data.userId,
-      user_name: data.userName,
-    });
+    try {
+      const purchaseModel = await this._purchasesModel.insert(
+        {
+          user_id: data.userId,
+          user_name: data.userName,
+        },
+        poolConnection
+      );
 
-    return new Purchase({
-      ...model,
-      productId: model.product_id,
-      productName: model.product_name,
-      userId: model.user_id,
-      userName: model.user_name,
-      createdAt: model.created_at,
-    });
+      const purchaseItemsModels =
+        await this._purchaseItemsRepository.insertMany(
+          data.items.map((item) => ({
+            purchase_id: purchaseModel.id,
+            amount: item.amount,
+            product_id: item.productId,
+            product_name: item.productName,
+          })),
+          poolConnection
+        );
+
+      await poolConnection.commit();
+
+      const purchase = new Purchase({
+        id: purchaseModel.id,
+        userId: purchaseModel.user_id,
+        userName: purchaseModel.user_name,
+        createdAt: purchaseModel.created_at,
+        items: purchaseItemsModels.map(
+          (item) =>
+            new PurchaseItem({
+              id: item.id,
+              purchaseId: item.purchase_id,
+              amount: item.amount,
+              productId: item.product_id,
+              productName: item.product_name,
+              createdAt: item.created_at,
+            })
+        ),
+      });
+
+      return purchase;
+    } catch (error) {
+      await poolConnection.rollback();
+      throw error;
+    } finally {
+      poolConnection.release();
+    }
   }
 
   async findById(id: number) {
@@ -52,10 +102,21 @@ export class PurchasesRepository {
 
     if (!foundPurchaseModel) return null;
 
+    const purchaseItems = foundPurchaseModel.items.map(
+      (item) =>
+        new PurchaseItem({
+          id: item.id,
+          purchaseId: item.purchase_id,
+          amount: item.amount,
+          productId: item.product_id,
+          productName: item.product_name,
+          createdAt: item.created_at,
+        })
+    );
+
     return new Purchase({
-      ...foundPurchaseModel,
-      productId: foundPurchaseModel.product_id,
-      productName: foundPurchaseModel.product_name,
+      id: foundPurchaseModel.id,
+      items: purchaseItems,
       userId: foundPurchaseModel.user_id,
       userName: foundPurchaseModel.user_name,
       createdAt: foundPurchaseModel.created_at,

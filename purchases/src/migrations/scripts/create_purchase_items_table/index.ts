@@ -1,24 +1,17 @@
 import { readFile } from "fs/promises";
-import path from "path";
 import { IMigration } from "../../interfaces";
+import path from "path";
 import { pool } from "../../../shared/config/db";
 
-class CreateMigrationsTable implements IMigration {
-  migrationName = "create_migrations_table";
+class CreatePurchasesTable implements IMigration {
+  migrationName = "create_purchase_items_table";
 
   async up() {
     try {
-      const [rows]: any = await pool.query("SHOW TABLES LIKE 'migrations'");
-
-      if (rows?.length && Object.values(rows[0]).includes("migrations")) {
-        return;
-      }
-
       const sqlPath = path.join(__dirname, "up.sql");
       const sql = await readFile(sqlPath, "utf8");
 
       await pool.query(sql);
-
       console.log(`Migration '${this.migrationName}' is up.`);
     } catch (error) {
       throw new Error(
@@ -42,4 +35,4 @@ class CreateMigrationsTable implements IMigration {
   }
 }
 
-export default new CreateMigrationsTable();
+export default new CreatePurchasesTable();

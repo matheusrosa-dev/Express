@@ -2,7 +2,14 @@ import { z } from "zod";
 
 export const decrementStockSchema = z
   .object({
-    amount: z.number().positive(),
+    items: z
+      .array(
+        z.object({
+          productId: z.number(),
+          amount: z.number().positive(),
+        })
+      )
+      .min(1),
   })
   .strip();
 

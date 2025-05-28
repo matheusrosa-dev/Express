@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import { PurchasesRepository } from "./repositories";
-import { Purchase } from "./entities";
+import { Purchase, PurchaseItem } from "./entities";
 import { productsServices, usersServices } from "../../shared/services";
+import { CreatePurchaseDto } from "./dtos";
 
 export class PurchasesService {
   private _purchasesRepository: PurchasesRepository;
@@ -10,8 +11,17 @@ export class PurchasesService {
     this._purchasesRepository = purchasesRepository;
   }
 
-  async findAll(_req: Request, res: Response) {
-    const purchases = await this._purchasesRepository.findAll();
+  async findByUserId(req: Request, res: Response) {
+    const userId = Number(req.params.userId);
+
+    const purchases = await this._purchasesRepository.findByUserId(userId);
+
+    if (!purchases.length) {
+      res
+        .status(404)
+        .send({ message: "The user has no purchases", data: null });
+      return;
+    }
 
     res.send({
       data: { purchases: purchases.map((purchase) => purchase.toJSON()) },
@@ -34,30 +44,32 @@ export class PurchasesService {
   }
 
   async create(req: Request, res: Response) {
+    const body = req.body as CreatePurchaseDto;
+
     try {
-      const [user, product] = await Promise.all([
-        usersServices.findById(req.body.userId),
-        productsServices.findById(req.body.productId),
+      const [user, ...products] = await Promise.all([
+        usersServices.findById(body.userId),
+        ...body.items.map((item) => productsServices.findById(item.productId)),
       ]);
 
-      if (req.body.amount > product.stock) {
-        res
-          .status(400)
-          .send({ message: "Product stock is not enough", data: null });
-
-        return;
-      }
-
-      await productsServices.decrementStock(product.id, {
-        amount: req.body.amount,
+      await productsServices.decrementStock({
+        items: body.items,
       });
 
+      const purchaseItems = products.map(
+        (product) =>
+          new PurchaseItem({
+            productId: product.id,
+            productName: product.name,
+            amount: body.items.find((item) => item.productId === product.id)!
+              .amount,
+          })
+      );
+
       const purchase = new Purchase({
-        amount: req.body.amount,
-        productId: product.id,
-        productName: product.name,
         userId: user.id,
         userName: user.name,
+        items: purchaseItems,
       });
 
       const newPurchase = await this._purchasesRepository.create(purchase);
