@@ -32,18 +32,26 @@ export class UsersController implements IUsersController {
     }
   }
 
-  async create(req: Request, res: Response) {
-    const dto = req.body as CreateUserDto;
+  async create(req: Request, res: Response, next: NextFunction) {
+    try {
+      const dto = req.body as CreateUserDto;
 
-    const response = await this._usersService.create(dto);
+      const response = await this._usersService.create(dto);
 
-    res.status(201).send(response);
+      res.status(201).send(response);
+    } catch (error) {
+      next(error);
+    }
   }
 
   async update(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = Number(req.params.userId);
       const dto = req.body as CreateUserDto;
+
+      if (isNaN(userId)) {
+        throw new BadRequestError("Invalid user id");
+      }
 
       const response = await this._usersService.update(userId, dto);
 
@@ -56,6 +64,10 @@ export class UsersController implements IUsersController {
   async delete(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = Number(req.params.userId);
+
+      if (isNaN(userId)) {
+        throw new BadRequestError("Invalid user id");
+      }
 
       await this._usersService.delete(userId);
 
