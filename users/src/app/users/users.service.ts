@@ -1,12 +1,11 @@
 import { Request, Response } from "express";
-import { UsersRepository } from "./repositories";
 import { User } from "./entities";
 import { IUsersRepository } from "./interfaces";
 
 export class UsersService {
   private _usersRepository: IUsersRepository;
 
-  constructor(usersRepository: UsersRepository) {
+  constructor(usersRepository: IUsersRepository) {
     this._usersRepository = usersRepository;
   }
 

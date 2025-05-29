@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const createProductDtoSchema = z
+export const updateProductDtoSchema = z
   .object({
     name: z.string().min(3),
     description: z.string().optional(),
@@ -9,4 +9,4 @@ export const createProductDtoSchema = z
   })
   .strip();
 
-export type CreateProductDto = z.infer<typeof createProductDtoSchema>;
+export type UpdateProductDto = z.infer<typeof updateProductDtoSchema>;

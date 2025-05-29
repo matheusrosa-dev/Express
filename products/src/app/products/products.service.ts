@@ -1,74 +1,70 @@
-import { Response, Request } from "express";
-import { ProductsRepository } from "./repositories";
 import { Product } from "./entities";
-import { DecrementStockDto } from "./dtos";
+import { CreateProductDto, DecrementStockDto, UpdateProductDto } from "./dtos";
+import { IProductsRepository, IProductsService } from "./interfaces";
 
-export class ProductsService {
-  _productsRepository: ProductsRepository;
+export class ProductsService implements IProductsService {
+  private _productsRepository: IProductsRepository;
 
-  constructor(productsRepository: ProductsRepository) {
+  constructor(productsRepository: IProductsRepository) {
     this._productsRepository = productsRepository;
   }
 
-  async findAll(_req: Request, res: Response) {
+  async findAll() {
     const products = await this._productsRepository.findAll();
 
-    res.send({
+    return {
       data: { products: products.map((product) => product.toJSON()) },
-    });
+    };
   }
 
-  async findById(req: Request, res: Response) {
-    const productId = Number(req.params.productId);
-
+  async findById(productId: number) {
     const foundProduct = await this._productsRepository.findById(productId);
 
     if (!foundProduct) {
-      res.status(404).send({ message: "Product not found", data: null });
-      return;
+      return {
+        message: "Product not found",
+        data: null,
+      };
     }
 
-    res.send({
+    return {
       data: foundProduct.toJSON(),
-    });
+    };
   }
 
-  async create(req: Request, res: Response) {
-    const product = new Product(req.body);
+  async create(dto: CreateProductDto) {
+    const product = new Product(dto);
 
     const newProduct = await this._productsRepository.create(product);
 
-    res.status(201).send({
+    return {
       data: newProduct.toJSON(),
-    });
+    };
   }
 
-  async update(req: Request, res: Response) {
-    const productId = Number(req.params.productId);
+  async update(productId: number, dto: UpdateProductDto) {
+    const existingProduct = await this._productsRepository.findById(productId);
 
-    const foundProduct = await this._productsRepository.findById(productId);
-
-    if (!foundProduct) {
-      res.status(404).send({ message: "Product not found", data: null });
-      return;
+    if (!existingProduct) {
+      return {
+        message: "Product not found",
+        data: null,
+      };
     }
 
-    const product = new Product({
-      id: productId,
-      ...req.body,
-    });
+    existingProduct.update(dto);
 
-    const updatedProduct = await this._productsRepository.update(product);
+    const updatedProduct = await this._productsRepository.update(
+      existingProduct
+    );
 
-    res.send({
+    return {
       data: updatedProduct.toJSON(),
-    });
+    };
   }
 
-  async decrementStock(req: Request, res: Response) {
-    const body = req.body as DecrementStockDto;
-
-    const productIds = body.items.map((item) => item.productId);
+  async decrementStock(dto: DecrementStockDto) {
+    const productIds = dto.items.map((item) => item.productId);
 
     const products = await this._productsRepository.findManyByIds(productIds);
 
@@ -78,53 +74,49 @@ export class ProductsService {
     );
 
     if (notFoundProductIds.length) {
-      res.status(404).send({
+      return {
         message: `Products with id [${notFoundProductIds.join(
           ", "
         )}] were not found`,
         data: null,
-      });
-      return;
+      };
     }
 
     const notEnoughStockProductIds = this._validateProductStock({
-      items: body.items,
+      items: dto.items,
       products,
     });
 
     if (notEnoughStockProductIds.length) {
-      res.status(400).send({
+      return {
         message: `Products with id [${notEnoughStockProductIds.join(
           ", "
         )}] do not have enough stock`,
         data: null,
-      });
-      return;
+      };
     }
 
     const updatedProducts =
       await this._productsRepository.decrementProductsStock({
-        items: body.items,
+        items: dto.items,
       });
 
-    res.send({
+    return {
       data: updatedProducts.map((product) => product.toJSON()),
-    });
+    };
   }
 
-  async delete(req: Request, res: Response) {
-    const productId = Number(req.params.productId);
-
+  async delete(productId: number) {
     const foundProduct = await this._productsRepository.findById(productId);
 
     if (!foundProduct) {
-      res.status(404).send({ message: "Product not found", data: null });
-      return;
+      return {
+        message: "Product not found",
+        data: null,
+      };
     }
 
     await this._productsRepository.delete(productId);
-
-    res.status(204).send();
   }
 
   private _validateProductStock(props: {

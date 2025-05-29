@@ -12,3 +12,4 @@ URGENTE
 remover models
 corrigir inversão de dependencia
 substituir controller por router?
+adicionar validação nas entidades

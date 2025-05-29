@@ -1,10 +1,10 @@
 import express from "express";
-import { productsController } from "./app/products/products.controller";
+import { productsRouter } from "./app/products/products.router";
 
 const app = express();
 
 app.use(express.json());
-app.use("/", productsController);
+app.use("/", productsRouter);
 
 app.listen(3333, () => {
   console.log(`Products service is running`);

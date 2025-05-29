@@ -1,43 +1,83 @@
-import { Router } from "express";
-import { ProductsRepository } from "./repositories";
-import { ProductsModel } from "./models";
-import { ProductsService } from "./products.service";
-import { zodValidationMiddleware } from "../../middlewares";
-import { createProductSchema, decrementStockSchema } from "./dtos";
+import { CreateProductDto, DecrementStockDto, UpdateProductDto } from "./dtos";
+import { IProductsController, IProductsService } from "./interfaces";
+import { Response, Request } from "express";
 
-const productsModel = new ProductsModel();
-const productsRepository = new ProductsRepository(productsModel);
-const productsService = new ProductsService(productsRepository);
+export class ProductsController implements IProductsController {
+  private _productsService: IProductsService;
 
-const productsController = Router();
+  constructor(productsService: IProductsService) {
+    this._productsService = productsService;
+  }
 
-productsController.get("/", productsService.findAll.bind(productsService));
+  async findAll(_req: Request, res: Response) {
+    const response = await this._productsService.findAll();
 
-productsController.post(
-  "/",
-  zodValidationMiddleware(createProductSchema),
-  productsService.create.bind(productsService)
-);
+    res.send(response);
+  }
 
-productsController.put(
-  "/decrement",
-  zodValidationMiddleware(decrementStockSchema),
-  productsService.decrementStock.bind(productsService)
-);
+  async findById(req: Request, res: Response) {
+    const productId = Number(req.params.productId);
 
-productsController.get(
-  "/:productId",
-  productsService.findById.bind(productsService)
-);
+    const response = await this._productsService.findById(productId);
 
-productsController.put(
-  "/:productId",
-  productsService.update.bind(productsService)
-);
+    if (response?.message === "Product not found") {
+      res.status(404).send(response);
+      return;
+    }
 
-productsController.delete(
-  "/:productId",
-  productsService.delete.bind(productsService)
-);
+    res.send(response);
+  }
 
-export { productsController };
+  async create(req: Request, res: Response) {
+    const dto = req.body as CreateProductDto;
+
+    const response = await this._productsService.create(dto);
+
+    res.status(201).send(response);
+  }
+
+  async update(req: Request, res: Response): Promise<void> {
+    const productId = Number(req.params.productId);
+    const dto = req.body as UpdateProductDto;
+
+    const response = await this._productsService.update(productId, dto);
+
+    if (response?.message === "Product not found") {
+      res.status(404).send(response);
+      return;
+    }
+
+    res.send(response);
+  }
+
+  async decrementStock(req: Request, res: Response): Promise<void> {
+    const dto = req.body as DecrementStockDto;
+
+    const response = await this._productsService.decrementStock(dto);
+
+    if (response?.message?.includes("were not found")) {
+      res.status(404).send(response);
+      return;
+    }
+
+    if (response?.message?.includes("not enough stock")) {
+      res.status(400).send(response);
+      return;
+    }
+
+    res.send(response);
+  }
+
+  async delete(req: Request, res: Response) {
+    const productId = Number(req.params.productId);
+
+    const response = await this._productsService.delete(productId);
+
+    if (response?.message === "Product not found") {
+      res.status(404).send(response);
+      return;
+    }
+
+    res.status(204).send();
+  }
+}

@@ -34,6 +34,23 @@ export class Product extends Entity {
     this._price = props.price;
   }
 
+  update(props: ProductProps) {
+    this._name = props.name;
+    this._description = props?.description;
+    this._stock = props?.stock;
+
+    if (typeof props.price === "string") {
+      if (Number.isNaN(Number(props.price))) {
+        throw new Error("Price must be a number");
+      }
+
+      this._price = Number(props.price);
+      return;
+    }
+
+    this._price = props.price;
+  }
+
   toJSON() {
     return {
       id: this._id,
