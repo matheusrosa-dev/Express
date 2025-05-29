@@ -1,39 +1,71 @@
-import { Router } from "express";
-import { PurchaseItemsRepository, PurchasesRepository } from "./repositories";
-import { PurchaseItemsModel, PurchasesModel } from "./models";
-import { PurchasesService } from "./purchases.service";
-import { zodValidationMiddleware } from "../../middlewares";
-import { createPurchaseSchema } from "./dtos/create-purchase.dto";
+import { Request, Response } from "express";
+import { IPurchasesService } from "./interfaces";
+import { CreatePurchaseDto } from "./dtos";
 
-const purchasesModel = new PurchasesModel();
-const purchaseItemsModel = new PurchaseItemsModel();
-const purchaseItemsRepository = new PurchaseItemsRepository(purchaseItemsModel);
-const purchasesRepository = new PurchasesRepository(
-  purchasesModel,
-  purchaseItemsRepository
-);
-const purchasesService = new PurchasesService(purchasesRepository);
-const purchasesController = Router();
+interface IPurchasesController {
+  findByUserId(req: Request, res: Response): Promise<void>;
+  findById(req: Request, res: Response): Promise<void>;
+  create(req: Request, res: Response): Promise<void>;
+  delete(req: Request, res: Response): Promise<void>;
+}
 
-purchasesController.get(
-  "/user/:userId",
-  purchasesService.findByUserId.bind(purchasesService)
-);
+export class PurchasesController implements IPurchasesController {
+  constructor(private _purchasesService: IPurchasesService) {}
 
-purchasesController.post(
-  "/",
-  zodValidationMiddleware(createPurchaseSchema),
-  purchasesService.create.bind(purchasesService)
-);
+  async findByUserId(req: Request, res: Response) {
+    const userId = Number(req.params.userId);
 
-purchasesController.get(
-  "/:purchaseId",
-  purchasesService.findById.bind(purchasesService)
-);
+    const response = await this._purchasesService.findByUserId(userId);
 
-purchasesController.delete(
-  "/:purchaseId",
-  purchasesService.delete.bind(purchasesService)
-);
+    if (response?.message === "The user has no purchases") {
+      res.status(404).send(response);
+      return;
+    }
 
-export { purchasesController };
+    res.status(200).send(response);
+  }
+
+  async findById(req: Request, res: Response) {
+    const purchaseId = Number(req.params.purchaseId);
+
+    const response = await this._purchasesService.findById(purchaseId);
+
+    if (response?.message === "Purchase not found") {
+      res.status(404).send(response);
+      return;
+    }
+
+    res.status(200).send(response);
+  }
+
+  async create(req: Request, res: Response) {
+    const dto = req.body as CreatePurchaseDto;
+
+    const response = await this._purchasesService.create(dto);
+
+    if (response?.message === "Internal server error") {
+      res.status(500).send(response);
+      return;
+    }
+
+    if (response?.message) {
+      res.status(400).send(response);
+      return;
+    }
+
+    res.status(201).send(response);
+  }
+
+  async delete(req: Request, res: Response) {
+    const purchaseId = Number(req.params.purchaseId);
+
+    const response = await this._purchasesService.delete(purchaseId);
+
+    if (response?.message === "Purchase not found") {
+      res.status(404).send(response);
+      return;
+    }
+
+    res.status(204).send();
+  }
+}

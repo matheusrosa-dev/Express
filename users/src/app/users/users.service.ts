@@ -1,59 +1,72 @@
-import { Request, Response } from "express";
-import { UsersRepository } from "./repositories";
 import { User } from "./entities";
+import { IUsersRepository, IUsersService } from "./interfaces";
+import { CreateUserDto } from "./dtos";
 
-export class UsersService {
-  private _usersRepository: UsersRepository;
+export class UsersService implements IUsersService {
+  constructor(private _usersRepository: IUsersRepository) {}
 
-  constructor(usersRepository: UsersRepository) {
-    this._usersRepository = usersRepository;
-  }
-
-  async findAll(_req: Request, res: Response) {
+  async findAll() {
     const users = await this._usersRepository.findAll();
 
-    res.send({
+    return {
       data: { users: users.map((user) => user.toJSON()) },
-    });
+    };
   }
 
-  async findById(req: Request, res: Response) {
-    const userId = Number(req.params.userId);
-
+  async findById(userId: number) {
     const foundUser = await this._usersRepository.findById(userId);
 
     if (!foundUser) {
-      res.status(404).send({ message: "User not found", data: null });
-      return;
+      return {
+        data: null,
+        message: "User not found",
+      };
     }
 
-    res.send({
+    return {
       data: foundUser.toJSON(),
-    });
+    };
   }
 
-  async create(req: Request, res: Response) {
-    const user = new User(req.body);
+  async create(dto: CreateUserDto) {
+    const user = new User(dto);
 
     const newUser = await this._usersRepository.create(user);
 
-    res.send({
+    return {
       data: newUser.toJSON(),
-    });
+    };
   }
 
-  async delete(req: Request, res: Response) {
-    const userId = Number(req.params.userId);
-
+  async update(userId: number, dto: CreateUserDto) {
     const foundUser = await this._usersRepository.findById(userId);
 
     if (!foundUser) {
-      res.status(404).send({ message: "User not found", data: null });
-      return;
+      return {
+        data: null,
+        message: "User not found",
+      };
+    }
+
+    foundUser.update(dto);
+
+    const updatedUser = await this._usersRepository.update(foundUser);
+
+    return {
+      data: updatedUser.toJSON(),
+    };
+  }
+
+  async delete(userId: number) {
+    const foundUser = await this._usersRepository.findById(userId);
+
+    if (!foundUser) {
+      return {
+        data: null,
+        message: "User not found",
+      };
     }
 
     await this._usersRepository.delete(userId);
-
-    res.status(204).send();
   }
 }

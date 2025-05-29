@@ -1,20 +1,61 @@
-import { Router } from "express";
-import { UsersRepository } from "./repositories";
-import { UsersModel } from "./models";
-import { UsersService } from "./users.service";
+import { Request, Response } from "express";
+import { IUsersController, IUsersService } from "./interfaces";
+import { CreateUserDto } from "./dtos";
 
-const usersModel = new UsersModel();
-const usersRepository = new UsersRepository(usersModel);
-const usersService = new UsersService(usersRepository);
+export class UsersController implements IUsersController {
+  constructor(private _usersService: IUsersService) {}
 
-const usersController = Router();
+  async findAll(req: Request, res: Response) {
+    const response = await this._usersService.findAll();
 
-usersController.get("/", usersService.findAll.bind(usersService));
+    res.status(200).send(response);
+  }
 
-usersController.post("/", usersService.create.bind(usersService));
+  async findById(req: Request, res: Response) {
+    const userId = Number(req.params.userId);
 
-usersController.get("/:userId", usersService.findById.bind(usersService));
+    const response = await this._usersService.findById(userId);
 
-usersController.delete("/:userId", usersService.delete.bind(usersService));
+    if (response?.message === "User not found") {
+      res.status(404).send(response);
+      return;
+    }
 
-export { usersController };
+    res.status(200).send(response);
+  }
+
+  async create(req: Request, res: Response) {
+    const dto = req.body as CreateUserDto;
+
+    const response = await this._usersService.create(dto);
+
+    res.status(201).send(response);
+  }
+
+  async update(req: Request, res: Response) {
+    const userId = Number(req.params.userId);
+    const dto = req.body as CreateUserDto;
+
+    const response = await this._usersService.update(userId, dto);
+
+    if (response?.message === "User not found") {
+      res.status(404).send(response);
+      return;
+    }
+
+    res.status(200).send(response);
+  }
+
+  async delete(req: Request, res: Response) {
+    const userId = Number(req.params.userId);
+
+    const response = await this._usersService.delete(userId);
+
+    if (response?.message === "User not found") {
+      res.status(404).send(response);
+      return;
+    }
+
+    res.status(204).send();
+  }
+}

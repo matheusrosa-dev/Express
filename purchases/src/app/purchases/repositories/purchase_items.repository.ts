@@ -1,32 +1,47 @@
 import { PoolConnection } from "mysql2/promise";
-import {
-  IPurchaseItemsModelProps,
-  PurchaseItemsModel,
-} from "../models/purchase_items.model";
+import { PurchaseItem } from "../entities";
+import { IPurchaseItemsRepository } from "../interfaces";
 
-type CreateUpdateData = Omit<
-  Omit<IPurchaseItemsModelProps, "id">,
-  "created_at"
->;
+//TODO: substituir query por execute
+export class PurchaseItemsRepository implements IPurchaseItemsRepository {
+  private _tableName = "purchase_items";
 
-export class PurchaseItemsRepository {
-  private _purchaseItemsModel: PurchaseItemsModel;
+  async createMany(
+    purchaseItems: PurchaseItem[],
+    poolConnection: PoolConnection
+  ) {
+    const dataJson = purchaseItems.map((purchaseItem) => purchaseItem.toJSON());
 
-  constructor(purchaseItemsModel: PurchaseItemsModel) {
-    this._purchaseItemsModel = purchaseItemsModel;
+    const values = dataJson.map((item) => [
+      item.purchaseId,
+      item.productId,
+      item.productName,
+      item.amount,
+    ]);
+
+    await poolConnection.query(
+      `INSERT INTO ${this._tableName} (purchase_id, product_id, product_name, amount) VALUES ?`,
+      [values]
+    );
   }
 
-  async insertMany(data: CreateUpdateData[], poolConnection: PoolConnection) {
-    const models = await this._purchaseItemsModel.insertMany(
-      data.map((item) => ({
-        purchase_id: item.purchase_id,
-        amount: item.amount,
-        product_id: item.product_id,
-        product_name: item.product_name,
-      })),
-      poolConnection
-    );
+  create(): Promise<PurchaseItem> {
+    throw new Error("Method not implemented.");
+  }
 
-    return models;
+  update(): Promise<PurchaseItem> {
+    throw new Error("Method not implemented.");
+  }
+
+  delete(): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+
+  findAll(): Promise<PurchaseItem[]> {
+    throw new Error("Method not implemented.");
+  }
+
+  findById(): Promise<PurchaseItem> {
+    throw new Error("Method not implemented.");
   }
 }

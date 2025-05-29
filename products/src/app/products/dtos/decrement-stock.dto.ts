@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const decrementStockSchema = z
+export const decrementStockDtoSchema = z
   .object({
     items: z
       .array(
@@ -13,4 +13,4 @@ export const decrementStockSchema = z
   })
   .strip();
 
-export type DecrementStockDto = z.infer<typeof decrementStockSchema>;
+export type DecrementStockDto = z.infer<typeof decrementStockDtoSchema>;

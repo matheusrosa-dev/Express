@@ -9,6 +9,8 @@ type ProductProps = {
   createdAt?: Date;
 };
 
+type UpdateProps = Omit<ProductProps, "id" | "createdAt">;
+
 export class Product extends Entity {
   private _name: string;
   private _description?: string;
@@ -18,6 +20,23 @@ export class Product extends Entity {
   constructor(props: ProductProps) {
     super(props);
 
+    this._name = props.name;
+    this._description = props?.description;
+    this._stock = props?.stock;
+
+    if (typeof props.price === "string") {
+      if (Number.isNaN(Number(props.price))) {
+        throw new Error("Price must be a number");
+      }
+
+      this._price = Number(props.price);
+      return;
+    }
+
+    this._price = props.price;
+  }
+
+  update(props: UpdateProps) {
     this._name = props.name;
     this._description = props?.description;
     this._stock = props?.stock;

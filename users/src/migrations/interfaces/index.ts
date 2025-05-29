@@ -1,1 +1,1 @@
-export { IMigration } from "./migration.interface";
+export * from "./migrations";

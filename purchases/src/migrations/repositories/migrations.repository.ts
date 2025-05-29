@@ -1,22 +1,23 @@
 import { pool } from "../../shared/config/db";
+import { IRepository } from "../../shared/interfaces";
 import { Migration } from "../entities";
-import { MigrationModel } from "../models";
+import { IMigrationsModel } from "../interfaces";
 
-export class MigrationsRepository {
-  private _migrationModel: MigrationModel;
-
-  constructor(migrationModel: MigrationModel) {
-    this._migrationModel = migrationModel;
-  }
+//TODO: substituir query por execute
+export class MigrationsRepository implements IRepository<Migration> {
+  private _tableName = "migrations";
 
   async findAll() {
-    const migrations = await this._migrationModel.findAll();
+    const [rows] = await pool.query(`SELECT * FROM ${this._tableName}`);
 
-    const entities = migrations.map(
-      (migration) =>
+    const models = rows as IMigrationsModel[];
+
+    const entities = models.map(
+      (model) =>
         new Migration({
-          ...migration,
-          createdAt: migration.created_at,
+          id: model.id,
+          name: model.name,
+          createdAt: model.created_at,
         })
     );
 
@@ -24,12 +25,12 @@ export class MigrationsRepository {
   }
 
   async findByName(name: string) {
-    const [rows]: any = await pool.execute(
+    const [rows] = await pool.execute(
       "SELECT * FROM migrations WHERE name = ?",
       [name]
     );
 
-    const migration = rows[0];
+    const migration = (rows as IMigrationsModel[])[0];
 
     if (!migration) return null;
 
@@ -39,20 +40,43 @@ export class MigrationsRepository {
     });
   }
 
-  async create(migration: Migration) {
-    const data = migration.toJSON();
+  async findById(id: number) {
+    const [rows] = await pool.execute(
+      `SELECT * FROM ${this._tableName} WHERE id = ?`,
+      [id]
+    );
 
-    const model = await this._migrationModel.insert({
-      name: data.name,
-    });
+    const model = (rows as IMigrationsModel[])[0];
+
+    if (!model) return null;
 
     return new Migration({
-      ...model,
+      id: model.id,
+      name: model.name,
       createdAt: model.created_at,
     });
   }
 
-  delete(id: number) {
-    return this._migrationModel.delete(id);
+  async create(migration: Migration) {
+    const dataToInsert = {
+      name: migration.toJSON().name,
+    };
+
+    const [insertResult]: any = await pool.query(
+      `INSERT INTO ${this._tableName} SET ?`,
+      dataToInsert
+    );
+
+    const createdMigration = await this.findById(insertResult.insertId);
+
+    return createdMigration!;
+  }
+
+  async delete(id: number) {
+    await pool.query(`DELETE FROM ${this._tableName} WHERE id = ?`, [id]);
+  }
+
+  update(): Promise<Migration> {
+    throw new Error("Method not implemented.");
   }
 }
