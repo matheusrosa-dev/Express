@@ -7,3 +7,8 @@ Adicionar update em todos MS
 Adicionar dto em tudo
 remover promise all
 implementar soft delete
+
+URGENTE
+remover models
+corrigir inversão de dependencia
+substituir controller por router?

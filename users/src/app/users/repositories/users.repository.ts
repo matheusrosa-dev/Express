@@ -1,45 +1,61 @@
 import { User } from "../entities";
-import { UsersModel } from "../models";
+import { pool } from "../../../shared/config/db";
+import { IUsersModel, IUsersRepository } from "../interfaces";
 
-export class UsersRepository {
-  private _usersModel: UsersModel;
-
-  constructor(usersModel: UsersModel) {
-    this._usersModel = usersModel;
-  }
+//TODO: substituir query por execute
+export class UsersRepository implements IUsersRepository {
+  private _tableName = "users";
 
   async findAll() {
-    const users = await this._usersModel.findAll();
+    const [rows] = await pool.query(`SELECT * FROM ${this._tableName}`);
 
-    const entities = users.map(
-      (user) => new User({ ...user, createdAt: user.created_at })
+    const models = rows as IUsersModel[];
+
+    const entities = models.map(
+      (model) =>
+        new User({
+          id: model.id,
+          name: model.name,
+          createdAt: model.created_at,
+        })
     );
 
     return entities;
   }
 
-  async findById(id: number) {
-    const foundUserModel = await this._usersModel.findById(id);
+  async findById(userId: number) {
+    const [rows] = await pool.execute(
+      `SELECT * FROM ${this._tableName} WHERE id = ?`,
+      [userId]
+    );
 
-    if (!foundUserModel) return null;
+    const row = (rows as IUsersModel[])[0];
+
+    if (!row) return null;
 
     return new User({
-      ...foundUserModel,
-      createdAt: foundUserModel.created_at,
+      id: row.id,
+      name: row.name,
+      createdAt: row.created_at,
     });
   }
 
   async create(user: User) {
-    const data = user.toJSON();
+    const dataToInsert = {
+      name: user.toJSON().name,
+    };
 
-    const model = await this._usersModel.insert({
-      name: data.name,
-    });
+    const [insertResult]: any = await pool.query(
+      `INSERT INTO ${this._tableName} SET ?`,
+      dataToInsert
+    );
 
-    return new User({ ...model, createdAt: model.created_at });
+    const createdUser = await this.findById(insertResult.insertId);
+
+    return createdUser!;
   }
 
   async delete(userId: number) {
-    await this._usersModel.delete(userId);
+    await pool.query(`DELETE FROM ${this._tableName} WHERE id = ?`, [userId]);
   }
 }

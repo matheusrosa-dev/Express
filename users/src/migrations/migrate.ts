@@ -3,13 +3,11 @@ import CreateMigrationsTable from "./scripts/create_migrations_table";
 import { migrations } from "./scripts";
 
 import { Migration } from "./entities";
-import { MigrationModel } from "./models";
 import { MigrationsRepository } from "./repositories";
 
 type Action = "up" | "down";
 
-const migrationModel = new MigrationModel();
-const migrationRepository = new MigrationsRepository(migrationModel);
+const migrationRepository = new MigrationsRepository();
 
 const runUpMigration = async (migration: (typeof migrations)[number]) => {
   const foundMigration = await migrationRepository.findByName(
