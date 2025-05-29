@@ -55,6 +55,24 @@ export class UsersRepository implements IUsersRepository {
     return createdUser!;
   }
 
+  async update(user: User) {
+    const userJson = user.toJSON();
+    const userId = userJson.id!;
+
+    const dataToInsert = {
+      name: userJson.name,
+    };
+
+    await pool.query(`UPDATE ${this._tableName} SET ? WHERE id = ?`, [
+      dataToInsert,
+      userId,
+    ]);
+
+    const updatedUser = await this.findById(userId);
+
+    return updatedUser!;
+  }
+
   async delete(userId: number) {
     await pool.query(`DELETE FROM ${this._tableName} WHERE id = ?`, [userId]);
   }

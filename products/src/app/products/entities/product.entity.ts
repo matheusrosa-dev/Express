@@ -9,6 +9,8 @@ type ProductProps = {
   createdAt?: Date;
 };
 
+type UpdateProps = Omit<ProductProps, "id" | "createdAt">;
+
 export class Product extends Entity {
   private _name: string;
   private _description?: string;
@@ -34,7 +36,7 @@ export class Product extends Entity {
     this._price = props.price;
   }
 
-  update(props: ProductProps) {
+  update(props: UpdateProps) {
     this._name = props.name;
     this._description = props?.description;
     this._stock = props?.stock;

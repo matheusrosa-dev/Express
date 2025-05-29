@@ -1,18 +1,28 @@
 import { Router } from "express";
 import { UsersRepository } from "./repositories";
 import { UsersService } from "./users.service";
+import { zodValidationMiddleware } from "../../middlewares";
+import { createUserDtoSchema } from "./dtos";
+import { UsersController } from "./users.controller";
 
 const usersRepository = new UsersRepository();
 const usersService = new UsersService(usersRepository);
+const usersController = new UsersController(usersService);
 
 const usersRouter = Router();
 
-usersRouter.get("/", usersService.findAll.bind(usersService));
+usersRouter.get("/", usersController.findAll.bind(usersController));
 
-usersRouter.post("/", usersService.create.bind(usersService));
+usersRouter.post(
+  "/",
+  zodValidationMiddleware(createUserDtoSchema),
+  usersController.create.bind(usersController)
+);
 
-usersRouter.get("/:userId", usersService.findById.bind(usersService));
+usersRouter.put("/:userId", usersController.update.bind(usersController));
 
-usersRouter.delete("/:userId", usersService.delete.bind(usersService));
+usersRouter.get("/:userId", usersController.findById.bind(usersController));
+
+usersRouter.delete("/:userId", usersController.delete.bind(usersController));
 
 export { usersRouter };

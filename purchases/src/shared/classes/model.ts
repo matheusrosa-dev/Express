@@ -1,7 +1,7 @@
 import { PoolConnection } from "mysql2/promise";
 import { pool } from "../config/db";
 
-type CreateUpdateData<ModelProps> = Omit<Omit<ModelProps, "id">, "created_at">;
+type CreateUpdateData<ModelProps> = Omit<ModelProps, "id" | "createdAt">;
 
 //TODO: substituir query por execute
 export abstract class Model<ModelProps> {

@@ -9,7 +9,7 @@ export class ProductsController implements IProductsController {
     this._productsService = productsService;
   }
 
-  async findAll(_req: Request, res: Response) {
+  async findAll(req: Request, res: Response) {
     const response = await this._productsService.findAll();
 
     res.send(response);

@@ -10,10 +10,7 @@ export interface IPurchaseItemsModelProps {
   created_at: Date;
 }
 
-type CreateUpdateData = Omit<
-  Omit<IPurchaseItemsModelProps, "id">,
-  "created_at"
->;
+type CreateUpdateData = Omit<IPurchaseItemsModelProps, "id" | "created_at">;
 
 //TODO: substituir query por execute
 export class PurchaseItemsModel extends Model<IPurchaseItemsModelProps> {

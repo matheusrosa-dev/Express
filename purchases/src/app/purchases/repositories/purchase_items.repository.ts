@@ -4,10 +4,7 @@ import {
   PurchaseItemsModel,
 } from "../models/purchase_items.model";
 
-type CreateUpdateData = Omit<
-  Omit<IPurchaseItemsModelProps, "id">,
-  "created_at"
->;
+type CreateUpdateData = Omit<IPurchaseItemsModelProps, "id" | "created_at">;
 
 export class PurchaseItemsRepository {
   private _purchaseItemsModel: PurchaseItemsModel;

@@ -44,7 +44,7 @@ export interface IProductsService {
 }
 
 export interface IProductsController {
-  findAll(_req: Request, res: Response): Promise<void>;
+  findAll(req: Request, res: Response): Promise<void>;
 
   findById(req: Request, res: Response): Promise<void>;
 

@@ -27,13 +27,13 @@ export class ProductsRepository implements IProductsRepository {
   }
 
   async create(product: Product) {
-    const dataJson = product.toJSON();
+    const productJson = product.toJSON();
 
     const dataToInsert = {
-      name: dataJson.name,
-      description: dataJson.description,
-      price: dataJson.price,
-      stock: dataJson.stock,
+      name: productJson.name,
+      description: productJson.description,
+      price: productJson.price,
+      stock: productJson.stock,
     };
 
     const [insertResult]: any = await pool.query(
@@ -93,15 +93,15 @@ export class ProductsRepository implements IProductsRepository {
     return products;
   }
 
-  async update(data: Product) {
-    const dataJson = data.toJSON();
-    const productId = dataJson.id!;
+  async update(product: Product) {
+    const productJson = product.toJSON();
+    const productId = productJson.id!;
 
     const dataToInsert = {
-      name: dataJson.name,
-      description: dataJson.description,
-      price: dataJson.price,
-      stock: dataJson.stock,
+      name: productJson.name,
+      description: productJson.description,
+      price: productJson.price,
+      stock: productJson.stock,
     };
 
     await pool.query(`UPDATE ${this._tableName} SET ? WHERE id = ?`, [
@@ -109,9 +109,9 @@ export class ProductsRepository implements IProductsRepository {
       productId,
     ]);
 
-    const product = await this.findById(productId);
+    const updatedProduct = await this.findById(productId);
 
-    return product!;
+    return updatedProduct!;
   }
 
   async delete(productId: number) {

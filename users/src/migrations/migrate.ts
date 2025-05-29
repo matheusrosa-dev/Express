@@ -91,17 +91,17 @@ const runMigrationByName = async (props: {
   }
 };
 
-const action = process.argv[2] as Action;
-const migrationName = process.argv[3];
-
-const hasAction = action === "up" || action === "down";
-
-if (!hasAction) {
-  console.log(`Invalid action: ${action}`);
-  throw new Error(`Invalid action`);
-}
-
 (async () => {
+  const action = process.argv[2] as Action;
+  const migrationName = process.argv[3];
+
+  const hasAction = action === "up" || action === "down";
+
+  if (!hasAction) {
+    console.log(`Invalid action: ${action}`);
+    throw new Error(`Invalid action`);
+  }
+
   if (action === "up") {
     await CreateMigrationsTable.up();
   }

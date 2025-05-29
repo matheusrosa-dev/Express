@@ -6,11 +6,17 @@ type UserProps = {
   createdAt?: Date;
 };
 
+type UpdateProps = Omit<UserProps, "id" | "createdAt">;
+
 export class User extends Entity {
   private _name: string;
 
   constructor(props: UserProps) {
     super(props);
+    this._name = props.name;
+  }
+
+  update(props: UpdateProps) {
     this._name = props.name;
   }
 
