@@ -3,11 +3,7 @@ import { IUsersController, IUsersService } from "./interfaces";
 import { CreateUserDto } from "./dtos";
 
 export class UsersController implements IUsersController {
-  private _usersService: IUsersService;
-
-  constructor(usersService: IUsersService) {
-    this._usersService = usersService;
-  }
+  constructor(private _usersService: IUsersService) {}
 
   async findAll(req: Request, res: Response) {
     const response = await this._usersService.findAll();

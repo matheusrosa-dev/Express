@@ -1,59 +1,50 @@
-import { Request, Response } from "express";
-import { PurchasesRepository } from "./repositories";
 import { Purchase, PurchaseItem } from "./entities";
 import { productsServices, usersServices } from "../../shared/services";
 import { CreatePurchaseDto } from "./dtos";
+import { IPurchasesRepository, IPurchasesService } from "./interfaces";
 
-export class PurchasesService {
-  private _purchasesRepository: PurchasesRepository;
+export class PurchasesService implements IPurchasesService {
+  constructor(private _purchasesRepository: IPurchasesRepository) {}
 
-  constructor(purchasesRepository: PurchasesRepository) {
-    this._purchasesRepository = purchasesRepository;
-  }
-
-  async findByUserId(req: Request, res: Response) {
-    const userId = Number(req.params.userId);
-
+  async findByUserId(userId: number) {
     const purchases = await this._purchasesRepository.findByUserId(userId);
 
     if (!purchases.length) {
-      res
-        .status(404)
-        .send({ message: "The user has no purchases", data: null });
-      return;
+      return {
+        data: null,
+        message: "The user has no purchases",
+      };
     }
 
-    res.send({
+    return {
       data: { purchases: purchases.map((purchase) => purchase.toJSON()) },
-    });
+    };
   }
 
-  async findById(req: Request, res: Response) {
-    const purchaseId = Number(req.params.purchaseId);
-
+  async findById(purchaseId: number) {
     const foundPurchase = await this._purchasesRepository.findById(purchaseId);
 
     if (!foundPurchase) {
-      res.status(404).send({ message: "Purchase not found", data: null });
-      return;
+      return {
+        data: null,
+        message: "Purchase not found",
+      };
     }
 
-    res.send({
+    return {
       data: foundPurchase.toJSON(),
-    });
+    };
   }
 
-  async create(req: Request, res: Response) {
-    const body = req.body as CreatePurchaseDto;
-
+  async create(dto: CreatePurchaseDto) {
     try {
       const [user, ...products] = await Promise.all([
-        usersServices.findById(body.userId),
-        ...body.items.map((item) => productsServices.findById(item.productId)),
+        usersServices.findById(dto.userId),
+        ...dto.items.map((item) => productsServices.findById(item.productId)),
       ]);
 
       await productsServices.decrementStock({
-        items: body.items,
+        items: dto.items,
       });
 
       const purchaseItems = products.map(
@@ -61,7 +52,7 @@ export class PurchasesService {
           new PurchaseItem({
             productId: product.id,
             productName: product.name,
-            amount: body.items.find((item) => item.productId === product.id)!
+            amount: dto.items.find((item) => item.productId === product.id)!
               .amount,
           })
       );
@@ -74,9 +65,9 @@ export class PurchasesService {
 
       const newPurchase = await this._purchasesRepository.create(purchase);
 
-      res.send({
+      return {
         data: newPurchase.toJSON(),
-      });
+      };
     } catch (e: any) {
       const response: {
         status?: number;
@@ -85,31 +76,32 @@ export class PurchasesService {
         };
       } = e?.response;
 
-      if (response?.status && response?.data?.message) {
-        res
-          .status(response.status)
-          .send({ message: response.data.message, data: null });
-        return;
+      if (response?.data?.message) {
+        return {
+          data: null,
+          message: response.data.message,
+        };
       }
 
       console.log(e);
 
-      res.status(500).send({ message: "Internal server error", data: null });
+      return {
+        data: null,
+        message: "Internal server error",
+      };
     }
   }
 
-  async delete(req: Request, res: Response) {
-    const purchaseId = Number(req.params.purchaseId);
-
+  async delete(purchaseId: number) {
     const foundPurchase = await this._purchasesRepository.findById(purchaseId);
 
     if (!foundPurchase) {
-      res.status(404).send({ message: "Purchase not found", data: null });
-      return;
+      return {
+        data: null,
+        message: "Purchase not found",
+      };
     }
 
     await this._purchasesRepository.delete(purchaseId);
-
-    res.status(204).send();
   }
 }

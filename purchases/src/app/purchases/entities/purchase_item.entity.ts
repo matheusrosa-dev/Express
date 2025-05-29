@@ -23,6 +23,10 @@ export class PurchaseItem extends Entity {
     this._productName = props.productName;
   }
 
+  set purchaseId(purchaseId: number) {
+    this._purchaseId = purchaseId;
+  }
+
   toJSON() {
     return {
       id: this._id,

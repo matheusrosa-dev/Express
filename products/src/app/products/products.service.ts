@@ -3,11 +3,7 @@ import { CreateProductDto, DecrementStockDto, UpdateProductDto } from "./dtos";
 import { IProductsRepository, IProductsService } from "./interfaces";
 
 export class ProductsService implements IProductsService {
-  private _productsRepository: IProductsRepository;
-
-  constructor(productsRepository: IProductsRepository) {
-    this._productsRepository = productsRepository;
-  }
+  constructor(private _productsRepository: IProductsRepository) {}
 
   async findAll() {
     const products = await this._productsRepository.findAll();
@@ -102,7 +98,9 @@ export class ProductsService implements IProductsService {
       });
 
     return {
-      data: updatedProducts.map((product) => product.toJSON()),
+      data: {
+        products: updatedProducts.map((product) => product.toJSON()),
+      },
     };
   }
 

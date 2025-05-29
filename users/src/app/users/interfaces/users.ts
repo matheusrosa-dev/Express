@@ -29,7 +29,7 @@ export interface IUsersService {
     dto: UpdateUserDto
   ): Promise<{ data: UserJSON | null; message?: string }>;
 
-  delete(userId: number): Promise<{ message?: string } | void>;
+  delete(userId: number): Promise<{ message?: string; data: null } | void>;
 }
 
 export interface IUsersController {

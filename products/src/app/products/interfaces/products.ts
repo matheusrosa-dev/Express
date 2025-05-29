@@ -36,11 +36,14 @@ export interface IProductsService {
     dto: UpdateProductDto
   ): Promise<{ data: ProductJSON | null; message?: string }>;
 
-  decrementStock(
-    dto: DecrementStockDto
-  ): Promise<{ data: ProductJSON[] | null; message?: string }>;
+  decrementStock(dto: DecrementStockDto): Promise<{
+    data: {
+      products: ProductJSON[];
+    } | null;
+    message?: string;
+  }>;
 
-  delete(productId: number): Promise<{ message?: string } | void>;
+  delete(productId: number): Promise<{ message?: string; data: null } | void>;
 }
 
 export interface IProductsController {

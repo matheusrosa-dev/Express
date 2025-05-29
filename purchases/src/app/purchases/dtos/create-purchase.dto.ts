@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const createPurchaseSchema = z
+export const createPurchaseDtoSchema = z
   .object({
     userId: z.number().positive(),
     items: z
@@ -14,4 +14,4 @@ export const createPurchaseSchema = z
   })
   .strip();
 
-export type CreatePurchaseDto = z.infer<typeof createPurchaseSchema>;
+export type CreatePurchaseDto = z.infer<typeof createPurchaseDtoSchema>;

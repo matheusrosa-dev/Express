@@ -76,7 +76,7 @@ export class MigrationsRepository implements IRepository<Migration> {
     await pool.query(`DELETE FROM ${this._tableName} WHERE id = ?`, [id]);
   }
 
-  async update(migration: Migration): Promise<Migration> {
+  update(): Promise<Migration> {
     throw new Error("Method not implemented.");
   }
 }

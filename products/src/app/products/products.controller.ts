@@ -3,11 +3,7 @@ import { IProductsController, IProductsService } from "./interfaces";
 import { Response, Request } from "express";
 
 export class ProductsController implements IProductsController {
-  private _productsService: IProductsService;
-
-  constructor(productsService: IProductsService) {
-    this._productsService = productsService;
-  }
+  constructor(private _productsService: IProductsService) {}
 
   async findAll(req: Request, res: Response) {
     const response = await this._productsService.findAll();
@@ -60,7 +56,7 @@ export class ProductsController implements IProductsController {
       return;
     }
 
-    if (response?.message?.includes("not enough stock")) {
+    if (response?.message?.includes("do not have enough stock")) {
       res.status(400).send(response);
       return;
     }

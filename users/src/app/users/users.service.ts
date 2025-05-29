@@ -3,11 +3,7 @@ import { IUsersRepository, IUsersService } from "./interfaces";
 import { CreateUserDto } from "./dtos";
 
 export class UsersService implements IUsersService {
-  private _usersRepository: IUsersRepository;
-
-  constructor(usersRepository: IUsersRepository) {
-    this._usersRepository = usersRepository;
-  }
+  constructor(private _usersRepository: IUsersRepository) {}
 
   async findAll() {
     const users = await this._usersRepository.findAll();
@@ -66,6 +62,7 @@ export class UsersService implements IUsersService {
 
     if (!foundUser) {
       return {
+        data: null,
         message: "User not found",
       };
     }

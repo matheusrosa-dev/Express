@@ -1,42 +1,58 @@
 import { pool } from "../../../shared/config/db";
 import { Purchase, PurchaseItem } from "../entities";
-import { PurchasesModel } from "../models";
-import { PurchaseItemsRepository } from "./purchase_items.repository";
+import {
+  IPurchaseItemsRepository,
+  IPurchasesModel,
+  IPurchasesRepository,
+} from "../interfaces";
 
-export class PurchasesRepository {
-  private _purchasesModel: PurchasesModel;
-  private _purchaseItemsRepository: PurchaseItemsRepository;
+//TODO: substituir query por execute
+export class PurchasesRepository implements IPurchasesRepository {
+  private _tableName = "purchases";
 
-  constructor(
-    purchasesModel: PurchasesModel,
-    purchaseItemsRepository: PurchaseItemsRepository
-  ) {
-    this._purchasesModel = purchasesModel;
-    this._purchaseItemsRepository = purchaseItemsRepository;
-  }
+  constructor(private _purchaseItemsRepository: IPurchaseItemsRepository) {}
 
   async findByUserId(userId: number) {
-    const purchasesModels = await this._purchasesModel.findByUserId(userId);
+    const [rows] = await pool.query(
+      `SELECT purchase.*, 
+      JSON_ARRAYAGG(
+        JSON_OBJECT(
+          'id', purchase_item.id,
+          'purchase_id', purchase_item.purchase_id,
+          'product_id', purchase_item.product_id,
+          'product_name', purchase_item.product_name,
+          'amount', purchase_item.amount,
+          'created_at', purchase_item.created_at
+        )
+      ) AS items
+      FROM purchases purchase
+      LEFT JOIN purchase_items purchase_item ON purchase.id = purchase_item.purchase_id
+      WHERE purchase.user_id = ?
+      GROUP BY purchase.id`,
+      [userId]
+    );
 
-    const purchases = purchasesModels.map((purchase) => {
-      const purchaseItem = purchase.items.map(
-        (item) =>
+    const models = rows as IPurchasesModel[];
+
+    const purchases = models.map((model) => {
+      const purchaseItems = model.items.map(
+        (itemModel) =>
           new PurchaseItem({
-            id: item.id,
-            amount: item.amount,
-            productId: item.product_id,
-            purchaseId: item.purchase_id,
-            productName: item.product_name,
-            createdAt: item.created_at,
+            id: itemModel.id,
+            amount: itemModel.amount,
+            productId: itemModel.product_id,
+            purchaseId: itemModel.purchase_id,
+            productName: itemModel.product_name,
+            createdAt: itemModel.created_at,
           })
       );
 
       return new Purchase({
-        id: purchase.id,
-        userId: purchase.user_id,
-        userName: purchase.user_name,
-        items: purchaseItem,
-        createdAt: purchase.created_at,
+        id: model.id,
+        userId: model.user_id,
+        userName: model.user_name,
+        items: purchaseItems,
+        createdAt: model.created_at,
       });
     });
 
@@ -46,84 +62,109 @@ export class PurchasesRepository {
   async create(purchase: Purchase) {
     const poolConnection = await pool.getConnection();
 
-    const data = purchase.toJSON();
-
     try {
-      const purchaseModel = await this._purchasesModel.insert(
-        {
-          user_id: data.userId,
-          user_name: data.userName,
-        },
+      const purchaseJson = purchase.toJSON();
+
+      const purchaseDataToInsert = {
+        user_id: purchaseJson.userId,
+        user_name: purchaseJson.userName,
+      };
+
+      poolConnection.beginTransaction();
+
+      const [insertResult]: any = await poolConnection.query(
+        `INSERT INTO ${this._tableName} SET ?`,
+        purchaseDataToInsert
+      );
+
+      const purchaseId = insertResult.insertId as number;
+
+      const purchaseItems = purchaseJson.items.map(
+        (purchaseItem) =>
+          new PurchaseItem({
+            purchaseId: purchaseId,
+            productId: purchaseItem.productId,
+            productName: purchaseItem.productName,
+            amount: purchaseItem.amount,
+          })
+      );
+
+      await this._purchaseItemsRepository.createMany(
+        purchaseItems,
         poolConnection
       );
 
-      const purchaseItemsModels =
-        await this._purchaseItemsRepository.insertMany(
-          data.items.map((item) => ({
-            purchase_id: purchaseModel.id,
-            amount: item.amount,
-            product_id: item.productId,
-            product_name: item.productName,
-          })),
-          poolConnection
-        );
-
       await poolConnection.commit();
 
-      const purchase = new Purchase({
-        id: purchaseModel.id,
-        userId: purchaseModel.user_id,
-        userName: purchaseModel.user_name,
-        createdAt: purchaseModel.created_at,
-        items: purchaseItemsModels.map(
-          (item) =>
-            new PurchaseItem({
-              id: item.id,
-              purchaseId: item.purchase_id,
-              amount: item.amount,
-              productId: item.product_id,
-              productName: item.product_name,
-              createdAt: item.created_at,
-            })
-        ),
-      });
+      const createdPurchase = await this.findById(insertResult.insertId);
 
-      return purchase;
+      return createdPurchase!;
     } catch (error) {
-      await poolConnection.rollback();
+      poolConnection.rollback();
       throw error;
     } finally {
       poolConnection.release();
     }
   }
 
-  async findById(id: number) {
-    const foundPurchaseModel = await this._purchasesModel.findById(id);
+  async findById(purchaseId: number) {
+    const [rows] = await pool.query(
+      `SELECT purchase.*, 
+      JSON_ARRAYAGG(
+        JSON_OBJECT(
+          'id', purchase_item.id,
+          'purchase_id', purchase_item.purchase_id,
+          'product_id', purchase_item.product_id,
+          'product_name', purchase_item.product_name,
+          'amount', purchase_item.amount,
+          'created_at', purchase_item.created_at
+        )
+      ) AS items
+      FROM purchases purchase
+      LEFT JOIN purchase_items purchase_item ON purchase.id = purchase_item.purchase_id
+      WHERE purchase.id = ?
+      GROUP BY purchase.id`,
+      [purchaseId]
+    );
 
-    if (!foundPurchaseModel) return null;
+    const model = (rows as IPurchasesModel[])[0];
 
-    const purchaseItems = foundPurchaseModel.items.map(
-      (item) =>
+    if (!model) return null;
+
+    const purchaseItems = model.items.map(
+      (itemModel) =>
         new PurchaseItem({
-          id: item.id,
-          purchaseId: item.purchase_id,
-          amount: item.amount,
-          productId: item.product_id,
-          productName: item.product_name,
-          createdAt: item.created_at,
+          id: itemModel.id,
+          purchaseId: itemModel.purchase_id,
+          amount: itemModel.amount,
+          productId: itemModel.product_id,
+          productName: itemModel.product_name,
+          createdAt: itemModel.created_at,
         })
     );
 
-    return new Purchase({
-      id: foundPurchaseModel.id,
+    const purchase = new Purchase({
+      id: model.id,
       items: purchaseItems,
-      userId: foundPurchaseModel.user_id,
-      userName: foundPurchaseModel.user_name,
-      createdAt: foundPurchaseModel.created_at,
+      userId: model.user_id,
+      userName: model.user_name,
+      createdAt: model.created_at,
     });
+
+    return purchase;
   }
 
   async delete(purchaseId: number) {
-    await this._purchasesModel.delete(purchaseId);
+    await pool.query(`DELETE FROM ${this._tableName} WHERE id = ?`, [
+      purchaseId,
+    ]);
+  }
+
+  findAll(): Promise<Purchase[]> {
+    throw new Error("Method not implemented.");
+  }
+
+  update(): Promise<Purchase> {
+    throw new Error("Method not implemented.");
   }
 }
