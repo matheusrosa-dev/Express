@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { UsersRepository } from "./repositories";
 import { UsersService } from "./users.service";
-import { zodValidationMiddleware } from "../../middlewares";
 import { createUserDtoSchema } from "./dtos";
 import { UsersController } from "./users.controller";
+import { bodyValidationMiddleware } from "../../shared/middlewares";
 
 const usersRepository = new UsersRepository();
 const usersService = new UsersService(usersRepository);
@@ -15,7 +15,7 @@ usersRouter.get("/", usersController.findAll.bind(usersController));
 
 usersRouter.post(
   "/",
-  zodValidationMiddleware(createUserDtoSchema),
+  bodyValidationMiddleware(createUserDtoSchema),
   usersController.create.bind(usersController)
 );
 

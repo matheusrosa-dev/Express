@@ -1,27 +1,35 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { IUsersController, IUsersService } from "./interfaces";
 import { CreateUserDto } from "./dtos";
+import { BadRequestError } from "../../shared/errors";
 
 export class UsersController implements IUsersController {
   constructor(private _usersService: IUsersService) {}
 
-  async findAll(req: Request, res: Response) {
-    const response = await this._usersService.findAll();
+  async findAll(req: Request, res: Response, next: NextFunction) {
+    try {
+      const response = await this._usersService.findAll();
 
-    res.status(200).send(response);
+      res.status(200).send(response);
+    } catch (error) {
+      next(error);
+    }
   }
 
-  async findById(req: Request, res: Response) {
-    const userId = Number(req.params.userId);
+  async findById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = Number(req.params.userId);
 
-    const response = await this._usersService.findById(userId);
+      if (isNaN(userId)) {
+        throw new BadRequestError("Invalid user id");
+      }
 
-    if (response?.message === "User not found") {
-      res.status(404).send(response);
-      return;
+      const response = await this._usersService.findById(userId);
+
+      res.status(200).send(response);
+    } catch (error) {
+      next(error);
     }
-
-    res.status(200).send(response);
   }
 
   async create(req: Request, res: Response) {
@@ -32,30 +40,28 @@ export class UsersController implements IUsersController {
     res.status(201).send(response);
   }
 
-  async update(req: Request, res: Response) {
-    const userId = Number(req.params.userId);
-    const dto = req.body as CreateUserDto;
+  async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = Number(req.params.userId);
+      const dto = req.body as CreateUserDto;
 
-    const response = await this._usersService.update(userId, dto);
+      const response = await this._usersService.update(userId, dto);
 
-    if (response?.message === "User not found") {
-      res.status(404).send(response);
-      return;
+      res.status(200).send(response);
+    } catch (error) {
+      next(error);
     }
-
-    res.status(200).send(response);
   }
 
-  async delete(req: Request, res: Response) {
-    const userId = Number(req.params.userId);
+  async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = Number(req.params.userId);
 
-    const response = await this._usersService.delete(userId);
+      await this._usersService.delete(userId);
 
-    if (response?.message === "User not found") {
-      res.status(404).send(response);
-      return;
+      res.status(204).send();
+    } catch (error) {
+      next(error);
     }
-
-    res.status(204).send();
   }
 }
