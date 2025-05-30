@@ -1,3 +1,4 @@
+import { Request, Response, NextFunction } from "express";
 import { IRepository } from "../../../shared/interfaces";
 import { CreatePurchaseDto } from "../dtos";
 import { Purchase } from "../entities";
@@ -21,17 +22,15 @@ export interface IPurchasesRepository extends IRepository<Purchase> {
 type ProductJSON = ReturnType<Purchase["toJSON"]>;
 
 export interface IPurchasesService {
-  findByUserId(
-    userId: number
-  ): Promise<{ data: { purchases: ProductJSON[] } | null; message?: string }>;
+  findByUserId(userId: number): Promise<{ data: { purchases: ProductJSON[] } }>;
+  findById(purchaseId: number): Promise<{ data: ProductJSON }>;
+  create(dto: CreatePurchaseDto): Promise<{ data: ProductJSON }>;
+  delete(purchaseId: number): Promise<void>;
+}
 
-  findById(
-    purchaseId: number
-  ): Promise<{ data: ProductJSON | null; message?: string }>;
-
-  create(
-    dto: CreatePurchaseDto
-  ): Promise<{ data: ProductJSON | null; message?: string }>;
-
-  delete(purchaseId: number): Promise<{ message?: string; data: null } | void>;
+export interface IPurchasesController {
+  findByUserId(req: Request, res: Response, next: NextFunction): Promise<void>;
+  findById(req: Request, res: Response, next: NextFunction): Promise<void>;
+  create(req: Request, res: Response, next: NextFunction): Promise<void>;
+  delete(req: Request, res: Response, next: NextFunction): Promise<void>;
 }

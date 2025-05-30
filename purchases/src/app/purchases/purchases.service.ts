@@ -2,6 +2,8 @@ import { Purchase, PurchaseItem } from "./entities";
 import { productsServices, usersServices } from "../../shared/services";
 import { CreatePurchaseDto } from "./dtos";
 import { IPurchasesRepository, IPurchasesService } from "./interfaces";
+import { NotFoundError } from "../../shared/errors";
+import { AppError } from "../../shared/classes";
 
 export class PurchasesService implements IPurchasesService {
   constructor(private _purchasesRepository: IPurchasesRepository) {}
@@ -10,10 +12,7 @@ export class PurchasesService implements IPurchasesService {
     const purchases = await this._purchasesRepository.findByUserId(userId);
 
     if (!purchases.length) {
-      return {
-        data: null,
-        message: "The user has no purchases",
-      };
+      throw new NotFoundError("The user has no purchases");
     }
 
     return {
@@ -25,10 +24,7 @@ export class PurchasesService implements IPurchasesService {
     const foundPurchase = await this._purchasesRepository.findById(purchaseId);
 
     if (!foundPurchase) {
-      return {
-        data: null,
-        message: "Purchase not found",
-      };
+      throw new NotFoundError("Purchase not found");
     }
 
     return {
@@ -69,26 +65,10 @@ export class PurchasesService implements IPurchasesService {
         data: newPurchase.toJSON(),
       };
     } catch (e: any) {
-      const response: {
-        status?: number;
-        data?: {
-          message?: string;
-        };
-      } = e?.response;
-
-      if (response?.data?.message) {
-        return {
-          data: null,
-          message: response.data.message,
-        };
-      }
-
-      console.log(e);
-
-      return {
-        data: null,
-        message: "Internal server error",
-      };
+      throw new AppError({
+        message: e?.response?.data?.message || "Internal server error",
+        statusCode: e?.response?.status || 500,
+      });
     }
   }
 
@@ -96,10 +76,7 @@ export class PurchasesService implements IPurchasesService {
     const foundPurchase = await this._purchasesRepository.findById(purchaseId);
 
     if (!foundPurchase) {
-      return {
-        data: null,
-        message: "Purchase not found",
-      };
+      throw new NotFoundError("Purchase not found");
     }
 
     await this._purchasesRepository.delete(purchaseId);

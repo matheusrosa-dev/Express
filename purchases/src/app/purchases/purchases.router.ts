@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { PurchaseItemsRepository, PurchasesRepository } from "./repositories";
 import { PurchasesService } from "./purchases.service";
-import { zodValidationMiddleware } from "../../middlewares";
 import { createPurchaseDtoSchema } from "./dtos/create-purchase.dto";
 import { PurchasesController } from "./purchases.controller";
+import { bodyValidationMiddleware } from "../../shared/middlewares";
 
 const purchaseItemsRepository = new PurchaseItemsRepository();
 const purchasesRepository = new PurchasesRepository(purchaseItemsRepository);
@@ -19,7 +19,7 @@ purchasesRouter.get(
 
 purchasesRouter.post(
   "/",
-  zodValidationMiddleware(createPurchaseDtoSchema),
+  bodyValidationMiddleware(createPurchaseDtoSchema),
   purchasesController.create.bind(purchasesController)
 );
 
