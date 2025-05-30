@@ -1,15 +1,8 @@
-import { CreateUserDto } from "../app/users/dtos";
+import kleur from "kleur";
 import { User } from "../app/users/entities";
 import { UsersRepository } from "../app/users/repositories";
+import { usersSeed } from "../db/seeds";
 import { pool } from "../shared/config/db";
-
-const createUserDtos: CreateUserDto[] = [
-  { name: "Alice Wonderland" },
-  { name: "Bob The Builder" },
-  { name: "Charlie Brown" },
-  { name: "Dora the Explorer" },
-  { name: "Elsa the Snow Queen" },
-];
 
 const usersRepository = new UsersRepository();
 
@@ -23,13 +16,13 @@ async function seedDatabase() {
     console.log("Inserting new users...");
 
     await Promise.all(
-      createUserDtos.map(async (userDto) => {
+      usersSeed.map(async (userDto) => {
         const entity = new User(userDto);
         return usersRepository.create(entity);
       })
     );
 
-    console.log("Users inserted successfully.");
+    console.log(kleur.bgGreen("Users inserted successfully."));
   } catch (error) {
     console.error(error);
     process.exit(1);

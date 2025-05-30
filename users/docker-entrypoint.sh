@@ -3,7 +3,7 @@
 echo "Docker-Entrypoint iniciado"
 
 npm install
-npm run migrate up
+npm run migrate
 
 echo "Docker-Entrypoint finalizado"
 
