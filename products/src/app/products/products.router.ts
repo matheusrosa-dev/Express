@@ -4,10 +4,16 @@ import { ProductsService } from "./products.service";
 import {
   createProductDtoSchema,
   decrementStockDtoSchema,
-  updateProductDtoSchema,
+  deleteProductDtoSchema,
+  findProductByIdDtoSchema,
+  updateProductBodyDtoSchema,
+  updateProductParamsDtoSchema,
 } from "./dtos";
 import { ProductsController } from "./products.controller";
-import { bodyValidationMiddleware } from "../../shared/middlewares";
+import {
+  bodyValidationMiddleware,
+  paramsValidationMiddleware,
+} from "../../shared/middlewares";
 
 const productsRepository = new ProductsRepository();
 const productsService = new ProductsService(productsRepository);
@@ -31,17 +37,20 @@ productsRouter.put(
 
 productsRouter.get(
   "/:productId",
+  paramsValidationMiddleware(findProductByIdDtoSchema),
   productsController.findById.bind(productsController)
 );
 
 productsRouter.put(
   "/:productId",
-  bodyValidationMiddleware(updateProductDtoSchema),
+  paramsValidationMiddleware(updateProductParamsDtoSchema),
+  bodyValidationMiddleware(updateProductBodyDtoSchema),
   productsController.update.bind(productsController)
 );
 
 productsRouter.delete(
   "/:productId",
+  paramsValidationMiddleware(deleteProductDtoSchema),
   productsController.delete.bind(productsController)
 );
 

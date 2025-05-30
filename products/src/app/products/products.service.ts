@@ -1,5 +1,9 @@
 import { Product } from "./entities";
-import { CreateProductDto, DecrementStockDto, UpdateProductDto } from "./dtos";
+import {
+  CreateProductDto,
+  DecrementStockDto,
+  UpdateProductBodyDto,
+} from "./dtos";
 import { IProductsRepository, IProductsService } from "./interfaces";
 import { BadRequestError, NotFoundError } from "../../shared/errors";
 
@@ -36,7 +40,7 @@ export class ProductsService implements IProductsService {
     };
   }
 
-  async update(productId: number, dto: UpdateProductDto) {
+  async update(productId: number, dto: UpdateProductBodyDto) {
     const existingProduct = await this._productsRepository.findById(productId);
 
     if (!existingProduct) {

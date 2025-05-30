@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const updateProductDtoSchema = z
+export const updateProductBodyDtoSchema = z
   .object({
     name: z.string().min(3),
     description: z.string().optional(),
@@ -9,4 +9,13 @@ export const updateProductDtoSchema = z
   })
   .strip();
 
-export type UpdateProductDto = z.infer<typeof updateProductDtoSchema>;
+export const updateProductParamsDtoSchema = z
+  .object({
+    productId: z.coerce.number().int().positive(),
+  })
+  .strip();
+
+export type UpdateProductBodyDto = z.infer<typeof updateProductBodyDtoSchema>;
+export type UpdateProductParamsDto = z.infer<
+  typeof updateProductParamsDtoSchema
+>;

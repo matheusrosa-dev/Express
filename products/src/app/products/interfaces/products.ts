@@ -1,5 +1,9 @@
 import { IRepository } from "../../../shared/interfaces";
-import { CreateProductDto, DecrementStockDto, UpdateProductDto } from "../dtos";
+import {
+  CreateProductDto,
+  DecrementStockDto,
+  UpdateProductBodyDto,
+} from "../dtos";
 import { Product } from "../entities";
 import { Response, Request, NextFunction } from "express";
 
@@ -31,7 +35,7 @@ export interface IProductsService {
 
   update(
     productId: number,
-    dto: UpdateProductDto
+    dto: UpdateProductBodyDto
   ): Promise<{ data: ProductJSON }>;
 
   decrementStock(dto: DecrementStockDto): Promise<{

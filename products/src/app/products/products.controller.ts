@@ -1,5 +1,12 @@
 import { BadRequestError } from "../../shared/errors";
-import { CreateProductDto, DecrementStockDto, UpdateProductDto } from "./dtos";
+import {
+  CreateProductDto,
+  DecrementStockDto,
+  DeleteProductDto,
+  FindProductByIdDto,
+  UpdateProductBodyDto,
+  UpdateProductParamsDto,
+} from "./dtos";
 import { IProductsController, IProductsService } from "./interfaces";
 import { Response, Request, NextFunction } from "express";
 
@@ -18,11 +25,7 @@ export class ProductsController implements IProductsController {
 
   async findById(req: Request, res: Response, next: NextFunction) {
     try {
-      const productId = Number(req.params.productId);
-
-      if (isNaN(productId)) {
-        throw new BadRequestError("Invalid product id");
-      }
+      const { productId } = req.params as unknown as FindProductByIdDto;
 
       const response = await this._productsService.findById(productId);
 
@@ -46,8 +49,8 @@ export class ProductsController implements IProductsController {
 
   async update(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const productId = Number(req.params.productId);
-      const dto = req.body as UpdateProductDto;
+      const { productId } = req.params as unknown as UpdateProductParamsDto;
+      const dto = req.body as UpdateProductBodyDto;
 
       if (isNaN(productId)) {
         throw new BadRequestError("Invalid product id");
@@ -79,11 +82,7 @@ export class ProductsController implements IProductsController {
 
   async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      const productId = Number(req.params.productId);
-
-      if (isNaN(productId)) {
-        throw new BadRequestError("Invalid product id");
-      }
+      const { productId } = req.params as unknown as DeleteProductDto;
 
       await this._productsService.delete(productId);
 
