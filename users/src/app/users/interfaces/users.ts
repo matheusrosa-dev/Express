@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { IRepository } from "../../../shared/interfaces";
-import { CreateUserDto, UpdateUserDto } from "../dtos";
+import { CreateUserDto, UpdateUserBodyDto } from "../dtos";
 import { User } from "../entities";
 
 export interface IUsersModel {
@@ -20,9 +20,7 @@ export interface IUsersService {
 
   create(user: CreateUserDto): Promise<{ data: UserJSON }>;
 
-  create(user: CreateUserDto): Promise<{ data: UserJSON }>;
-
-  update(userId: number, dto: UpdateUserDto): Promise<{ data: UserJSON }>;
+  update(userId: number, dto: UpdateUserBodyDto): Promise<{ data: UserJSON }>;
 
   delete(userId: number): Promise<void>;
 }

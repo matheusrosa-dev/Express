@@ -1,6 +1,6 @@
 import { User } from "./entities";
 import { IUsersRepository, IUsersService } from "./interfaces";
-import { CreateUserDto } from "./dtos";
+import { CreateUserDto, UpdateUserBodyDto } from "./dtos";
 import { NotFoundError } from "../../shared/errors";
 
 export class UsersService implements IUsersService {
@@ -36,7 +36,7 @@ export class UsersService implements IUsersService {
     };
   }
 
-  async update(userId: number, dto: CreateUserDto) {
+  async update(userId: number, dto: UpdateUserBodyDto) {
     const foundUser = await this._usersRepository.findById(userId);
 
     if (!foundUser) {

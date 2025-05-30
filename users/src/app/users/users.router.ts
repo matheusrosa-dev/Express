@@ -1,9 +1,18 @@
 import { Router } from "express";
 import { UsersRepository } from "./repositories";
 import { UsersService } from "./users.service";
-import { createUserDtoSchema } from "./dtos";
+import {
+  createUserDtoSchema,
+  deleteUserDtoSchema,
+  findUserByIdDtoSchema,
+  updateUserBodyDtoSchema,
+  updateUserParamsDtoSchema,
+} from "./dtos";
 import { UsersController } from "./users.controller";
-import { bodyValidationMiddleware } from "../../shared/middlewares";
+import {
+  bodyValidationMiddleware,
+  paramsValidationMiddleware,
+} from "../../shared/middlewares";
 
 const usersRepository = new UsersRepository();
 const usersService = new UsersService(usersRepository);
@@ -19,10 +28,23 @@ usersRouter.post(
   usersController.create.bind(usersController)
 );
 
-usersRouter.put("/:userId", usersController.update.bind(usersController));
+usersRouter.put(
+  "/:userId",
+  paramsValidationMiddleware(updateUserParamsDtoSchema),
+  bodyValidationMiddleware(updateUserBodyDtoSchema),
+  usersController.update.bind(usersController)
+);
 
-usersRouter.get("/:userId", usersController.findById.bind(usersController));
+usersRouter.get(
+  "/:userId",
+  paramsValidationMiddleware(findUserByIdDtoSchema),
+  usersController.findById.bind(usersController)
+);
 
-usersRouter.delete("/:userId", usersController.delete.bind(usersController));
+usersRouter.delete(
+  "/:userId",
+  paramsValidationMiddleware(deleteUserDtoSchema),
+  usersController.delete.bind(usersController)
+);
 
 export { usersRouter };

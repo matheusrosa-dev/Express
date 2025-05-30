@@ -1,7 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 import { IUsersController, IUsersService } from "./interfaces";
-import { CreateUserDto } from "./dtos";
-import { BadRequestError } from "../../shared/errors";
+import {
+  CreateUserDto,
+  DeleteUserDto,
+  FindUserByIdDto,
+  UpdateUserBodyDto,
+  UpdateUserParamsDto,
+} from "./dtos";
 
 export class UsersController implements IUsersController {
   constructor(private _usersService: IUsersService) {}
@@ -18,11 +23,7 @@ export class UsersController implements IUsersController {
 
   async findById(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = Number(req.params.userId);
-
-      if (isNaN(userId)) {
-        throw new BadRequestError("Invalid user id");
-      }
+      const { userId } = req.params as unknown as FindUserByIdDto;
 
       const response = await this._usersService.findById(userId);
 
@@ -46,12 +47,8 @@ export class UsersController implements IUsersController {
 
   async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = Number(req.params.userId);
-      const dto = req.body as CreateUserDto;
-
-      if (isNaN(userId)) {
-        throw new BadRequestError("Invalid user id");
-      }
+      const { userId } = req.params as unknown as UpdateUserParamsDto;
+      const dto = req.body as UpdateUserBodyDto;
 
       const response = await this._usersService.update(userId, dto);
 
@@ -63,11 +60,7 @@ export class UsersController implements IUsersController {
 
   async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = Number(req.params.userId);
-
-      if (isNaN(userId)) {
-        throw new BadRequestError("Invalid user id");
-      }
+      const { userId } = req.params as unknown as DeleteUserDto;
 
       await this._usersService.delete(userId);
 
