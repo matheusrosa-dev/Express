@@ -1,5 +1,5 @@
 import { Entity } from "../../../shared/classes";
-import { PurchaseItem } from "./purchase_item.entity";
+import { PurchaseItem } from "./purchase-item.entity";
 
 type PurchaseProps = {
   id?: number;

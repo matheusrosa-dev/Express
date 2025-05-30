@@ -10,5 +10,3 @@ implementar soft delete
 URGENTE
 adicionar validação nas entidades
 adicionar validação isNaN
-adicionar classes de erro
-substitir snake case no nome dos arquivos por -

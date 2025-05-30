@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { IRepository } from "../../../shared/interfaces";
 import { CreatePurchaseDto } from "../dtos";
 import { Purchase } from "../entities";
-import { IPurchaseItemsModel } from "./purchase_items";
+import { IPurchaseItemsModel } from "./purchase-items";
 
 export interface IPurchasesModel {
   id: number;

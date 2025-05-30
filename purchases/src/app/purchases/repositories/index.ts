@@ -1,2 +1,2 @@
 export { PurchasesRepository } from "./purchases.repository";
-export { PurchaseItemsRepository } from "./purchase_items.repository";
+export { PurchaseItemsRepository } from "./purchase-items.repository";
