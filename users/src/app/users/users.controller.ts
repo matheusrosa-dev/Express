@@ -1,61 +1,79 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { IUsersController, IUsersService } from "./interfaces";
 import { CreateUserDto } from "./dtos";
+import { BadRequestError } from "../../shared/errors";
 
 export class UsersController implements IUsersController {
   constructor(private _usersService: IUsersService) {}
 
-  async findAll(req: Request, res: Response) {
-    const response = await this._usersService.findAll();
+  async findAll(req: Request, res: Response, next: NextFunction) {
+    try {
+      const response = await this._usersService.findAll();
 
-    res.status(200).send(response);
-  }
-
-  async findById(req: Request, res: Response) {
-    const userId = Number(req.params.userId);
-
-    const response = await this._usersService.findById(userId);
-
-    if (response?.message === "User not found") {
-      res.status(404).send(response);
-      return;
+      res.status(200).send(response);
+    } catch (error) {
+      next(error);
     }
-
-    res.status(200).send(response);
   }
 
-  async create(req: Request, res: Response) {
-    const dto = req.body as CreateUserDto;
+  async findById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = Number(req.params.userId);
 
-    const response = await this._usersService.create(dto);
+      if (isNaN(userId)) {
+        throw new BadRequestError("Invalid user id");
+      }
 
-    res.status(201).send(response);
-  }
+      const response = await this._usersService.findById(userId);
 
-  async update(req: Request, res: Response) {
-    const userId = Number(req.params.userId);
-    const dto = req.body as CreateUserDto;
-
-    const response = await this._usersService.update(userId, dto);
-
-    if (response?.message === "User not found") {
-      res.status(404).send(response);
-      return;
+      res.status(200).send(response);
+    } catch (error) {
+      next(error);
     }
-
-    res.status(200).send(response);
   }
 
-  async delete(req: Request, res: Response) {
-    const userId = Number(req.params.userId);
+  async create(req: Request, res: Response, next: NextFunction) {
+    try {
+      const dto = req.body as CreateUserDto;
 
-    const response = await this._usersService.delete(userId);
+      const response = await this._usersService.create(dto);
 
-    if (response?.message === "User not found") {
-      res.status(404).send(response);
-      return;
+      res.status(201).send(response);
+    } catch (error) {
+      next(error);
     }
+  }
 
-    res.status(204).send();
+  async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = Number(req.params.userId);
+      const dto = req.body as CreateUserDto;
+
+      if (isNaN(userId)) {
+        throw new BadRequestError("Invalid user id");
+      }
+
+      const response = await this._usersService.update(userId, dto);
+
+      res.status(200).send(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = Number(req.params.userId);
+
+      if (isNaN(userId)) {
+        throw new BadRequestError("Invalid user id");
+      }
+
+      await this._usersService.delete(userId);
+
+      res.status(204).send();
+    } catch (error) {
+      next(error);
+    }
   }
 }

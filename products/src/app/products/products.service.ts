@@ -1,6 +1,7 @@
 import { Product } from "./entities";
 import { CreateProductDto, DecrementStockDto, UpdateProductDto } from "./dtos";
 import { IProductsRepository, IProductsService } from "./interfaces";
+import { BadRequestError, NotFoundError } from "../../shared/errors";
 
 export class ProductsService implements IProductsService {
   constructor(private _productsRepository: IProductsRepository) {}
@@ -17,10 +18,7 @@ export class ProductsService implements IProductsService {
     const foundProduct = await this._productsRepository.findById(productId);
 
     if (!foundProduct) {
-      return {
-        message: "Product not found",
-        data: null,
-      };
+      throw new NotFoundError("Product not found");
     }
 
     return {
@@ -42,10 +40,7 @@ export class ProductsService implements IProductsService {
     const existingProduct = await this._productsRepository.findById(productId);
 
     if (!existingProduct) {
-      return {
-        message: "Product not found",
-        data: null,
-      };
+      throw new NotFoundError("Product not found");
     }
 
     existingProduct.update(dto);
@@ -70,12 +65,9 @@ export class ProductsService implements IProductsService {
     );
 
     if (notFoundProductIds.length) {
-      return {
-        message: `Products with id [${notFoundProductIds.join(
-          ", "
-        )}] were not found`,
-        data: null,
-      };
+      throw new NotFoundError(
+        `Products with id [${notFoundProductIds.join(", ")}] were not found`
+      );
     }
 
     const notEnoughStockProductIds = this._validateProductStock({
@@ -84,12 +76,11 @@ export class ProductsService implements IProductsService {
     });
 
     if (notEnoughStockProductIds.length) {
-      return {
-        message: `Products with id [${notEnoughStockProductIds.join(
+      throw new BadRequestError(
+        `Products with id [${notEnoughStockProductIds.join(
           ", "
-        )}] do not have enough stock`,
-        data: null,
-      };
+        )}] do not have enough stock`
+      );
     }
 
     const updatedProducts =
@@ -108,10 +99,7 @@ export class ProductsService implements IProductsService {
     const foundProduct = await this._productsRepository.findById(productId);
 
     if (!foundProduct) {
-      return {
-        message: "Product not found",
-        data: null,
-      };
+      throw new NotFoundError("Product not found");
     }
 
     await this._productsRepository.delete(productId);

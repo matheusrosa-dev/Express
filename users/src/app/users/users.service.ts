@@ -1,6 +1,7 @@
 import { User } from "./entities";
 import { IUsersRepository, IUsersService } from "./interfaces";
 import { CreateUserDto } from "./dtos";
+import { NotFoundError } from "../../shared/errors";
 
 export class UsersService implements IUsersService {
   constructor(private _usersRepository: IUsersRepository) {}
@@ -17,10 +18,7 @@ export class UsersService implements IUsersService {
     const foundUser = await this._usersRepository.findById(userId);
 
     if (!foundUser) {
-      return {
-        data: null,
-        message: "User not found",
-      };
+      throw new NotFoundError("User not found");
     }
 
     return {
@@ -42,10 +40,7 @@ export class UsersService implements IUsersService {
     const foundUser = await this._usersRepository.findById(userId);
 
     if (!foundUser) {
-      return {
-        data: null,
-        message: "User not found",
-      };
+      throw new NotFoundError("User not found");
     }
 
     foundUser.update(dto);
@@ -61,10 +56,7 @@ export class UsersService implements IUsersService {
     const foundUser = await this._usersRepository.findById(userId);
 
     if (!foundUser) {
-      return {
-        data: null,
-        message: "User not found",
-      };
+      throw new NotFoundError("User not found");
     }
 
     await this._usersRepository.delete(userId);

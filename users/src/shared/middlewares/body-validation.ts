@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { AnyZodObject, ZodError } from "zod";
 
-export const zodValidationMiddleware =
+export const bodyValidationMiddleware =
   (schema: AnyZodObject) =>
   (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -19,7 +19,6 @@ export const zodValidationMiddleware =
 
         return;
       }
-      // Tratar outros erros inesperados
       res.status(500).send({ message: "Internal server error", data: null });
     }
   };

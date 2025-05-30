@@ -3,13 +3,12 @@ Adicionar MS de email
 Adicionar Redis
 Adicionar login?
 Criar seeds
-Adicionar update em todos MS
 Adicionar dto em tudo
 remover promise all
 implementar soft delete
 
 URGENTE
-remover models
-corrigir inversão de dependencia
-substituir controller por router?
 adicionar validação nas entidades
+adicionar validação isNaN
+adicionar classes de erro
+substitir snake case no nome dos arquivos por -
