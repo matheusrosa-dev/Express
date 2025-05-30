@@ -1,13 +1,13 @@
 import { Router } from "express";
 import { ProductsRepository } from "./repositories";
 import { ProductsService } from "./products.service";
-import { zodValidationMiddleware } from "../../middlewares";
 import {
   createProductDtoSchema,
   decrementStockDtoSchema,
   updateProductDtoSchema,
 } from "./dtos";
 import { ProductsController } from "./products.controller";
+import { bodyValidationMiddleware } from "../../shared/middlewares";
 
 const productsRepository = new ProductsRepository();
 const productsService = new ProductsService(productsRepository);
@@ -19,13 +19,13 @@ productsRouter.get("/", productsController.findAll.bind(productsController));
 
 productsRouter.post(
   "/",
-  zodValidationMiddleware(createProductDtoSchema),
+  bodyValidationMiddleware(createProductDtoSchema),
   productsController.create.bind(productsController)
 );
 
 productsRouter.put(
   "/decrement",
-  zodValidationMiddleware(decrementStockDtoSchema),
+  bodyValidationMiddleware(decrementStockDtoSchema),
   productsController.decrementStock.bind(productsController)
 );
 
@@ -36,7 +36,7 @@ productsRouter.get(
 
 productsRouter.put(
   "/:productId",
-  zodValidationMiddleware(updateProductDtoSchema),
+  bodyValidationMiddleware(updateProductDtoSchema),
   productsController.update.bind(productsController)
 );
 

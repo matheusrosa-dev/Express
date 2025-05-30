@@ -1,79 +1,95 @@
+import { BadRequestError } from "../../shared/errors";
 import { CreateProductDto, DecrementStockDto, UpdateProductDto } from "./dtos";
 import { IProductsController, IProductsService } from "./interfaces";
-import { Response, Request } from "express";
+import { Response, Request, NextFunction } from "express";
 
 export class ProductsController implements IProductsController {
   constructor(private _productsService: IProductsService) {}
 
-  async findAll(req: Request, res: Response) {
-    const response = await this._productsService.findAll();
+  async findAll(req: Request, res: Response, next: NextFunction) {
+    try {
+      const response = await this._productsService.findAll();
 
-    res.send(response);
+      res.send(response);
+    } catch (error) {
+      next(error);
+    }
   }
 
-  async findById(req: Request, res: Response) {
-    const productId = Number(req.params.productId);
+  async findById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const productId = Number(req.params.productId);
 
-    const response = await this._productsService.findById(productId);
+      if (isNaN(productId)) {
+        throw new BadRequestError("Invalid product id");
+      }
 
-    if (response?.message === "Product not found") {
-      res.status(404).send(response);
-      return;
+      const response = await this._productsService.findById(productId);
+
+      res.send(response);
+    } catch (error) {
+      next(error);
     }
-
-    res.send(response);
   }
 
-  async create(req: Request, res: Response) {
-    const dto = req.body as CreateProductDto;
+  async create(req: Request, res: Response, next: NextFunction) {
+    try {
+      const dto = req.body as CreateProductDto;
 
-    const response = await this._productsService.create(dto);
+      const response = await this._productsService.create(dto);
 
-    res.status(201).send(response);
+      res.status(201).send(response);
+    } catch (error) {
+      next(error);
+    }
   }
 
-  async update(req: Request, res: Response): Promise<void> {
-    const productId = Number(req.params.productId);
-    const dto = req.body as UpdateProductDto;
+  async update(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const productId = Number(req.params.productId);
+      const dto = req.body as UpdateProductDto;
 
-    const response = await this._productsService.update(productId, dto);
+      if (isNaN(productId)) {
+        throw new BadRequestError("Invalid product id");
+      }
 
-    if (response?.message === "Product not found") {
-      res.status(404).send(response);
-      return;
+      const response = await this._productsService.update(productId, dto);
+
+      res.send(response);
+    } catch (error) {
+      next(error);
     }
-
-    res.send(response);
   }
 
-  async decrementStock(req: Request, res: Response): Promise<void> {
-    const dto = req.body as DecrementStockDto;
+  async decrementStock(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const dto = req.body as DecrementStockDto;
 
-    const response = await this._productsService.decrementStock(dto);
+      const response = await this._productsService.decrementStock(dto);
 
-    if (response?.message?.includes("were not found")) {
-      res.status(404).send(response);
-      return;
+      res.send(response);
+    } catch (error) {
+      next(error);
     }
-
-    if (response?.message?.includes("do not have enough stock")) {
-      res.status(400).send(response);
-      return;
-    }
-
-    res.send(response);
   }
 
-  async delete(req: Request, res: Response) {
-    const productId = Number(req.params.productId);
+  async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      const productId = Number(req.params.productId);
 
-    const response = await this._productsService.delete(productId);
+      if (isNaN(productId)) {
+        throw new BadRequestError("Invalid product id");
+      }
 
-    if (response?.message === "Product not found") {
-      res.status(404).send(response);
-      return;
+      await this._productsService.delete(productId);
+
+      res.status(204).send();
+    } catch (error) {
+      next(error);
     }
-
-    res.status(204).send();
   }
 }

@@ -19,7 +19,6 @@ export const zodValidationMiddleware =
 
         return;
       }
-      // Tratar outros erros inesperados
       res.status(500).send({ message: "Internal server error", data: null });
     }
   };

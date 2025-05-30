@@ -1,7 +1,7 @@
 import { IRepository } from "../../../shared/interfaces";
 import { CreateProductDto, DecrementStockDto, UpdateProductDto } from "../dtos";
 import { Product } from "../entities";
-import { Response, Request } from "express";
+import { Response, Request, NextFunction } from "express";
 
 export interface IProductsModel {
   id: number;
@@ -25,37 +25,38 @@ type ProductJSON = ReturnType<Product["toJSON"]>;
 export interface IProductsService {
   findAll(): Promise<{ data: { products: ProductJSON[] } }>;
 
-  findById(
-    productId: number
-  ): Promise<{ data: ProductJSON | null; message?: string }>;
+  findById(productId: number): Promise<{ data: ProductJSON }>;
 
   create(dto: CreateProductDto): Promise<{ data: ProductJSON }>;
 
   update(
     productId: number,
     dto: UpdateProductDto
-  ): Promise<{ data: ProductJSON | null; message?: string }>;
+  ): Promise<{ data: ProductJSON }>;
 
   decrementStock(dto: DecrementStockDto): Promise<{
     data: {
       products: ProductJSON[];
-    } | null;
-    message?: string;
+    };
   }>;
 
-  delete(productId: number): Promise<{ message?: string; data: null } | void>;
+  delete(productId: number): Promise<void>;
 }
 
 export interface IProductsController {
-  findAll(req: Request, res: Response): Promise<void>;
+  findAll(req: Request, res: Response, next: NextFunction): Promise<void>;
 
-  findById(req: Request, res: Response): Promise<void>;
+  findById(req: Request, res: Response, next: NextFunction): Promise<void>;
 
-  create(req: Request, res: Response): Promise<void>;
+  create(req: Request, res: Response, next: NextFunction): Promise<void>;
 
-  update(req: Request, res: Response): Promise<void>;
+  update(req: Request, res: Response, next: NextFunction): Promise<void>;
 
-  decrementStock(req: Request, res: Response): Promise<void>;
+  decrementStock(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void>;
 
-  delete(req: Request, res: Response): Promise<void>;
+  delete(req: Request, res: Response, next: NextFunction): Promise<void>;
 }
