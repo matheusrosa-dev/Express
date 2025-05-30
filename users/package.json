@@ -5,7 +5,8 @@
     "build": "tsc",
     "start": "node dist/main.js",
     "dev": "tsx watch src/main.ts",
-    "migrate": "tsx ./src/migrations/migrate.ts"
+    "migrate": "tsx ./src/migrations/migrate.ts",
+    "seed": "tsx ./src/scripts/seed.ts"
   },
   "author": "",
   "license": "ISC",
