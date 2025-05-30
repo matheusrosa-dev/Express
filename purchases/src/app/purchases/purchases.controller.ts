@@ -1,6 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { IPurchasesController, IPurchasesService } from "./interfaces";
-import { CreatePurchaseDto } from "./dtos";
+import {
+  CreatePurchaseDto,
+  DeletePurchaseDto,
+  FindPurchaseByIdDto,
+  FindPurchasesByUserIdDto,
+} from "./dtos";
 import { BadRequestError } from "../../shared/errors";
 
 export class PurchasesController implements IPurchasesController {
@@ -8,11 +13,7 @@ export class PurchasesController implements IPurchasesController {
 
   async findByUserId(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = Number(req.params.userId);
-
-      if (isNaN(userId)) {
-        throw new BadRequestError("Invalid user id");
-      }
+      const { userId } = req.params as unknown as FindPurchasesByUserIdDto;
 
       const response = await this._purchasesService.findByUserId(userId);
 
@@ -24,11 +25,7 @@ export class PurchasesController implements IPurchasesController {
 
   async findById(req: Request, res: Response, next: NextFunction) {
     try {
-      const purchaseId = Number(req.params.purchaseId);
-
-      if (isNaN(purchaseId)) {
-        throw new BadRequestError("Invalid purchase id");
-      }
+      const { purchaseId } = req.params as unknown as FindPurchaseByIdDto;
 
       const response = await this._purchasesService.findById(purchaseId);
 
@@ -52,11 +49,7 @@ export class PurchasesController implements IPurchasesController {
 
   async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      const purchaseId = Number(req.params.purchaseId);
-
-      if (isNaN(purchaseId)) {
-        throw new BadRequestError("Invalid purchase id");
-      }
+      const { purchaseId } = req.params as unknown as DeletePurchaseDto;
 
       await this._purchasesService.delete(purchaseId);
 

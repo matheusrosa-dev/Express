@@ -8,3 +8,5 @@ implementar soft delete
 URGENTE
 adicionar validação nas entidades
 validar params das rotas
+
+kafka ou rabbitmq

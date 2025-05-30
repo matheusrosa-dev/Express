@@ -1,9 +1,16 @@
 import { Router } from "express";
 import { PurchaseItemsRepository, PurchasesRepository } from "./repositories";
 import { PurchasesService } from "./purchases.service";
-import { createPurchaseDtoSchema } from "./dtos/create-purchase.dto";
 import { PurchasesController } from "./purchases.controller";
-import { bodyValidationMiddleware } from "../../shared/middlewares";
+import {
+  bodyValidationMiddleware,
+  paramsValidationMiddleware,
+} from "../../shared/middlewares";
+import {
+  createPurchaseDtoSchema,
+  deletePurchaseDtoSchema,
+  findPurchasesByUserIdDtoSchema,
+} from "./dtos";
 
 const purchaseItemsRepository = new PurchaseItemsRepository();
 const purchasesRepository = new PurchasesRepository(purchaseItemsRepository);
@@ -14,6 +21,7 @@ const purchasesRouter = Router();
 
 purchasesRouter.get(
   "/user/:userId",
+  paramsValidationMiddleware(findPurchasesByUserIdDtoSchema),
   purchasesController.findByUserId.bind(purchasesController)
 );
 
@@ -25,11 +33,13 @@ purchasesRouter.post(
 
 purchasesRouter.get(
   "/:purchaseId",
+  paramsValidationMiddleware(deletePurchaseDtoSchema),
   purchasesController.findById.bind(purchasesController)
 );
 
 purchasesRouter.delete(
   "/:purchaseId",
+  paramsValidationMiddleware(deletePurchaseDtoSchema),
   purchasesController.delete.bind(purchasesController)
 );
 
