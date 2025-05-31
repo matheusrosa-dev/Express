@@ -1,12 +1,10 @@
 Adicionar CRON
 Adicionar MS de email
-Adicionar Redis
+kafka ou rabbitmq
 Adicionar login?
-remover promise all
 implementar soft delete
 
 URGENTE
 adicionar validação nas entidades
-validar params das rotas
-
-kafka ou rabbitmq
+remover promise all
+adicionar testes
