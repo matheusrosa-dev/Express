@@ -1,40 +1,49 @@
 services:
-  proxy-gateway:
-    build:
-      context: ./proxy-gateway
-    container_name: proxy-gateway
-    ports:
-      - 3333:3333
-    networks:
-      - microservices
+  # proxy-gateway:
+  #   build:
+  #     context: ./proxy-gateway
+  #   container_name: proxy-gateway
+  #   ports:
+  #     - 3333:3333
+  #   networks:
+  #     - microservices
 
-  db-products:
+  # db-products:
+  #   image: mysql:8.0-debian
+  #   container_name: db-products
+  #   ports:
+  #     - 3306:3306
+  #   environment:
+  #     - MYSQL_DATABASE=db-products
+  #     - MYSQL_ROOT_PASSWORD=root
+  #   networks:
+  #     - microservices
+
+  # api-products:
+  #   image: node:22
+  #   entrypoint: tail -f /dev/null
+  #   container_name: api-products
+  #   volumes:
+  #     - ./products:/app
+  #   networks:
+  #     - microservices
+
+  # db-users:
+  #   image: mysql:8.0-debian
+  #   container_name: db-users
+  #   ports:
+  #     - 3307:3306
+  #   environment:
+  #     - MYSQL_DATABASE=db-users
+  #     - MYSQL_ROOT_PASSWORD=root
+  #   networks:
+  #     - microservices
+
+  db-users-test:
     image: mysql:8.0-debian
-    container_name: db-products
-    ports:
-      - 3306:3306
+    container_name: db-users-test
     environment:
-      - MYSQL_DATABASE=db-products
-      - MYSQL_ROOT_PASSWORD=root
-    networks:
-      - microservices
-
-  api-products:
-    image: node:22
-    entrypoint: tail -f /dev/null
-    container_name: api-products
-    volumes:
-      - ./products:/app
-    networks:
-      - microservices
-
-  db-users:
-    image: mysql:8.0-debian
-    container_name: db-users
-    ports:
-      - 3307:3306
-    environment:
-      - MYSQL_DATABASE=db-users
+      - MYSQL_DATABASE=db-users-test
       - MYSQL_ROOT_PASSWORD=root
     networks:
       - microservices
@@ -48,25 +57,25 @@ services:
     networks:
       - microservices
 
-  db-purchases:
-    image: mysql:8.0-debian
-    container_name: db-purchases
-    ports:
-      - 3308:3306
-    environment:
-      - MYSQL_DATABASE=db-purchases
-      - MYSQL_ROOT_PASSWORD=root
-    networks:
-      - microservices
+  # db-purchases:
+  #   image: mysql:8.0-debian
+  #   container_name: db-purchases
+  #   ports:
+  #     - 3308:3306
+  #   environment:
+  #     - MYSQL_DATABASE=db-purchases
+  #     - MYSQL_ROOT_PASSWORD=root
+  #   networks:
+  #     - microservices
 
-  api-purchases:
-    image: node:22
-    entrypoint: tail -f /dev/null
-    container_name: api-purchases
-    volumes:
-      - ./purchases:/app
-    networks:
-      - microservices
+  # api-purchases:
+  #   image: node:22
+  #   entrypoint: tail -f /dev/null
+  #   container_name: api-purchases
+  #   volumes:
+  #     - ./purchases:/app
+  #   networks:
+  #     - microservices
 
 networks:
   microservices:
