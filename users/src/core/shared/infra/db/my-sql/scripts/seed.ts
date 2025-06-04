@@ -1,7 +1,7 @@
 import kleur from "kleur";
 import { mysqlPool } from "../connection";
-import { UserMySQLRepository } from "../../../../../user/infra/db/my-sql/user.repository";
-import { UserFactory } from "../../../../../user/domain/user.factory";
+import { UserMySQLRepository } from "../../../../../infra/user/db/my-sql/user.repository";
+import { UserFactory } from "../../../../../domain/user/user.factory";
 
 const usersRepository = new UserMySQLRepository();
 
