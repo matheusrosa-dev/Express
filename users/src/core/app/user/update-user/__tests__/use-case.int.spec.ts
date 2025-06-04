@@ -1,33 +1,42 @@
 import { Chance } from "chance";
-import { CreateUser } from "../use-case";
+import { UpdateUser } from "../use-case";
 import { UserMySQLRepository } from "../../../../infra/user/db/my-sql/user.repository";
 import { mysqlPool } from "../../../../shared/infra/db/my-sql/connection";
-import { Uuid } from "../../../../shared/domain/value-objects";
+import { Email, Uuid } from "../../../../shared/domain/value-objects";
 import { UserFactory } from "../../../../domain/user/user.factory";
-import { ConflictUser } from "../../common/errors";
+import { NotFoundUser } from "../../common/errors";
 
 const chance = Chance();
 
-describe("Create User Integration Tests", () => {
+describe("Update User Integration Tests", () => {
   const repository = new UserMySQLRepository();
-  const useCase = new CreateUser(repository);
+  const useCase = new UpdateUser(repository);
 
   beforeEach(() => {
     mysqlPool.execute(`DELETE FROM ${repository.tableName}`);
   });
 
   it("Should create a user", async () => {
-    const spyInsert = jest.spyOn(repository, "insert");
+    const spyInsert = jest.spyOn(repository, "update");
 
-    const output = await useCase.execute({
+    const user = UserFactory.fake().one().build();
+
+    await repository.insert(user);
+
+    user.update({
       name: chance.name(),
-      email: chance.email(),
+      email: new Email(chance.email()),
     });
 
-    expect(spyInsert).toHaveBeenCalledTimes(1);
+    const output = await useCase.execute({
+      id: user.id.id,
+      name: user.name,
+      email: user.email.email,
+    });
 
     const foundUser = (await repository.findById(new Uuid(output.id)))!;
 
+    expect(spyInsert).toHaveBeenCalledTimes(1);
     expect(output).toStrictEqual({
       id: foundUser.id.id,
       name: foundUser.name,
@@ -40,14 +49,13 @@ describe("Create User Integration Tests", () => {
   it("Should throw an error when user already exists", async () => {
     const user = UserFactory.fake().one().build();
 
-    await repository.insert(user);
-
     await expect(
       useCase.execute({
+        id: user.id.id,
         name: user.name,
         email: user.email.email,
       })
-    ).rejects.toThrow(new ConflictUser());
+    ).rejects.toThrow(new NotFoundUser());
   });
 
   afterAll(async () => {
