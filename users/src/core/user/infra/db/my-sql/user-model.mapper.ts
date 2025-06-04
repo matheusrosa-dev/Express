@@ -7,12 +7,20 @@ export type Model = {
   name: string;
   email: string;
   status: Status;
-  createdAt: Date;
+  created_at: Date;
 };
 
 export class ModelMapper {
   static toModel(user: User): Model {
-    return user.toJSON();
+    const userJson = user.toJSON();
+
+    return {
+      id: userJson.id,
+      name: userJson.name,
+      email: userJson.email,
+      status: userJson.status,
+      created_at: user.createdAt,
+    };
   }
 
   static toEntity(model: Model): User {
@@ -21,7 +29,7 @@ export class ModelMapper {
       name: model.name,
       email: new Email(model.email),
       status: model.status,
-      createdAt: model.createdAt,
+      createdAt: model.created_at,
     });
 
     user.validate();

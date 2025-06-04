@@ -1,29 +1,33 @@
 import { User } from "../../../domain/user.entity";
 import { IUserRepository } from "../../../domain/user.repository";
-import mysql from "mysql2/promise";
 import { Model, ModelMapper } from "./user-model.mapper";
 import { Uuid } from "../../../../shared/domain/value-objects";
+import { mysqlPool } from "../../../../shared/infra/db/my-sql/connection";
 
 export class UserMySQLRepository implements IUserRepository {
   private _tableName = "users";
 
-  constructor(private _connection: mysql.Pool) {}
-
   async insert(entity: User) {
     const model = ModelMapper.toModel(entity);
 
-    const [insertResult]: any = await this._connection.execute(
-      `INSERT INTO ${this._tableName} SET ?`,
-      model
+    const columns = Object.keys(model);
+    const placeholders = columns.map(() => "?").join(", ");
+    const values = Object.values(model);
+
+    await mysqlPool.execute(
+      `INSERT INTO ${this._tableName} (${columns.join(
+        ", "
+      )}) VALUES (${placeholders})`,
+      values
     );
 
-    const user = await this.findById(insertResult.insertId);
+    const user = await this.findById(entity.id);
 
     return user!;
   }
 
   async findById(id: Uuid) {
-    const [rows] = await this._connection.execute(
+    const [rows] = await mysqlPool.execute(
       `SELECT * FROM ${this._tableName} WHERE id = ?`,
       [id.id]
     );
@@ -40,9 +44,16 @@ export class UserMySQLRepository implements IUserRepository {
   async update(entity: User) {
     const model = ModelMapper.toModel(entity);
 
-    await this._connection.query(
-      `UPDATE ${this._tableName} SET ? WHERE id = ?`,
-      [model, entity.id.id]
+    // @ts-expect-error - ID must not be updated
+    delete model.id;
+
+    const columns = Object.keys(model);
+    const setClause = columns.map((col) => `${col} = ?`).join(", ");
+    const values = [...Object.values(model), entity.id.id];
+
+    await mysqlPool.execute(
+      `UPDATE ${this._tableName} SET ${setClause} WHERE id = ?`,
+      values
     );
 
     const updatedUser = await this.findById(entity.id);
@@ -51,9 +62,7 @@ export class UserMySQLRepository implements IUserRepository {
   }
 
   async findAll() {
-    const [rows] = await this._connection.query(
-      `SELECT * FROM ${this._tableName}`
-    );
+    const [rows] = await mysqlPool.execute(`SELECT * FROM ${this._tableName}`);
 
     const models = rows as Model[];
 
@@ -63,9 +72,8 @@ export class UserMySQLRepository implements IUserRepository {
   }
 
   async delete(id: Uuid) {
-    await this._connection.query(
-      `DELETE FROM ${this._tableName} WHERE id = ?`,
-      [id.id]
-    );
+    await mysqlPool.execute(`DELETE FROM ${this._tableName} WHERE id = ?`, [
+      id.id,
+    ]);
   }
 }

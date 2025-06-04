@@ -1,1 +1,1 @@
-export { InvalidUserError } from "./invalid-user";
+export { InvalidUser } from "./invalid-user";

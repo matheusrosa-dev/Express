@@ -11,5 +11,5 @@ export type UserConstructor = {
 
 export type CreateUserProps = {
   name: string;
-  email: Email;
+  email: string;
 };

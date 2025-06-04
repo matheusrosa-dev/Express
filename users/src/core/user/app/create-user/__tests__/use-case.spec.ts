@@ -1,7 +1,6 @@
 import { Chance } from "chance";
 import { UserInMemoryRepository } from "../../../infra/db/in-memory/user.repository";
 import { CreateUser } from "../use-case";
-import { Email } from "../../../../shared/domain/value-objects";
 
 const chance = Chance();
 
@@ -19,7 +18,7 @@ describe("Create User Unit Tests", () => {
 
     const output = await createUser.execute({
       name: chance.name(),
-      email: new Email(chance.email()),
+      email: chance.email(),
     });
 
     expect(spyInsert).toHaveBeenCalledTimes(1);

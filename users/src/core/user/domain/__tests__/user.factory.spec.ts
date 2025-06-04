@@ -12,7 +12,7 @@ describe("UserFactory Unit Tests", () => {
   describe("Factory", () => {
     it("Should create a user", () => {
       const user = UserFactory.create({
-        email: new Email(chance.email()),
+        email: chance.email(),
         name: chance.name(),
       });
 
@@ -60,11 +60,11 @@ describe("UserFactory Unit Tests", () => {
       });
 
       it("Should create with provided email", () => {
-        const email = new Email(chance.email());
+        const email = chance.email();
         const faker = UserFactory.fake().one();
         const user = faker.withEmail(email).build();
 
-        expect(user.email.equals(email)).toBe(true);
+        expect(user.email.email).toEqual(email);
       });
 
       it("Should create with provided status", () => {
@@ -128,12 +128,12 @@ describe("UserFactory Unit Tests", () => {
       });
 
       it("Should create with provided email", () => {
-        const email = new Email(chance.email());
+        const email = chance.email();
         const faker = UserFactory.fake().many(5);
         const users = faker.withEmail(email).build();
 
         users.forEach((user) => {
-          expect(user.email.equals(email)).toBe(true);
+          expect(user.email.email).toEqual(email);
         });
       });
 

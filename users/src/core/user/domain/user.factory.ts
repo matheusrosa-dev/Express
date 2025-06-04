@@ -9,7 +9,7 @@ export class UserFactory {
     const user = new User({
       id: new Uuid(),
       name: props.name,
-      email: props.email,
+      email: new Email(props.email),
       status: Status.ACTIVE,
       createdAt: new Date(),
     });
@@ -56,8 +56,8 @@ class UserFakeBuilder<Build extends User | User[]> {
     return this;
   }
 
-  withEmail(email: Email) {
-    this._email = email;
+  withEmail(email: string) {
+    this._email = new Email(email);
     return this;
   }
 
