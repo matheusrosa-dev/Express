@@ -6,7 +6,7 @@ export abstract class InMemoryRepository<
   Entity extends IEntity<Id>
 > implements IRepository<Id, Entity>
 {
-  private _entities: Entity[] = [];
+  protected _entities: Entity[] = [];
 
   async insert(entity: Entity) {
     this._entities.push(entity);

@@ -1,9 +1,13 @@
+import { DomainError } from "../classes";
 import { validateEmail } from "../utils";
 import { ValueObject } from "./value-object";
 
-export class InvalidEmailError extends Error {
+export class InvalidEmailError extends DomainError {
   constructor() {
-    super("Email is not valid");
+    super({
+      message: "Invalid email",
+      statusCode: 400,
+    });
   }
 }
 

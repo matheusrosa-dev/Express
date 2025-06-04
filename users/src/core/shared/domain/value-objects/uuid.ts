@@ -1,9 +1,13 @@
 import * as uuid from "uuid";
 import { ValueObject } from "./value-object";
+import { DomainError } from "../classes";
 
-export class InvalidUuidError extends Error {
+export class InvalidUuidError extends DomainError {
   constructor() {
-    super("Uuid is not valid");
+    super({
+      message: "Invalid uuid",
+      statusCode: 400,
+    });
   }
 }
 
