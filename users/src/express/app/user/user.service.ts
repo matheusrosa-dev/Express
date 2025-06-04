@@ -6,12 +6,14 @@ import { CreateUser } from "../../../core/app/user/create-user/use-case";
 import { FindUserById } from "../../../core/app/user/find-user-by-id/use-case";
 import { DeleteUser } from "../../../core/app/user/delete-user/use-case";
 import { User } from "./types";
+import { UpdateUser } from "../../../core/app/user/update-user/use-case";
 
 export class UserService implements IUserService {
   private _findAllUsersUseCase: FindAllUsers;
   private _createUserUseCase: CreateUser;
   private _findUserByIdUseCase: FindUserById;
   private _deleteUserUseCase: DeleteUser;
+  private _updateUserUseCase: UpdateUser;
 
   constructor() {
     const repository = new UserMySQLRepository();
@@ -19,6 +21,7 @@ export class UserService implements IUserService {
     this._createUserUseCase = new CreateUser(repository);
     this._findUserByIdUseCase = new FindUserById(repository);
     this._deleteUserUseCase = new DeleteUser(repository);
+    this._updateUserUseCase = new UpdateUser(repository);
   }
 
   async findAll() {
@@ -45,25 +48,16 @@ export class UserService implements IUserService {
     };
   }
 
-  update(userId: string, dto: UpdateUserBodyDto): Promise<{ data: User }> {
-    throw new Error("Method not implemented.");
+  async update(userId: string, dto: UpdateUserBodyDto) {
+    const output = await this._updateUserUseCase.execute({
+      id: userId,
+      ...dto,
+    });
+
+    return {
+      data: output,
+    };
   }
-
-  // async update(userId: number, dto: UpdateUserBodyDto) {
-  //   const foundUser = await this._usersRepository.findById(userId);
-
-  //   if (!foundUser) {
-  //     throw new NotFoundError("User not found");
-  //   }
-
-  //   foundUser.update(dto);
-
-  //   const updatedUser = await this._usersRepository.update(foundUser);
-
-  //   return {
-  //     data: updatedUser.toJSON(),
-  //   };
-  // }
 
   async delete(userId: string) {
     await this._deleteUserUseCase.execute({ id: userId });

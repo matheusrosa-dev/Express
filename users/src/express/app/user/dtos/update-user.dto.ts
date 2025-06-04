@@ -2,7 +2,8 @@ import { z } from "zod";
 
 export const updateUserBodyDtoSchema = z
   .object({
-    name: z.string().min(3),
+    name: z.string().min(3).optional(),
+    email: z.string().email().optional(),
   })
   .strip();
 
