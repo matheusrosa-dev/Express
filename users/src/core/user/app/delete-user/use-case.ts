@@ -1,7 +1,7 @@
 import { IUseCase } from "../../../shared/application/interfaces";
 import { Uuid } from "../../../shared/domain/value-objects";
 import { IUserRepository } from "../../domain/user.repository";
-import { NotFoundUser } from "../errors";
+import { NotFoundUser } from "../common/errors";
 import { Input } from "./types";
 
 export class DeleteUser implements IUseCase<Input, void> {

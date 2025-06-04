@@ -7,6 +7,10 @@ import { mysqlPool } from "../../../../shared/infra/db/my-sql/connection";
 export class UserMySQLRepository implements IUserRepository {
   private _tableName = "users";
 
+  get tableName() {
+    return this._tableName;
+  }
+
   async insert(entity: User) {
     const model = ModelMapper.toModel(entity);
 

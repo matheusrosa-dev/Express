@@ -5,18 +5,18 @@ import { CreateUser } from "../use-case";
 const chance = Chance();
 
 describe("Create User Unit Tests", () => {
-  let createUser: CreateUser;
+  let useCase: CreateUser;
   let repository: UserInMemoryRepository;
 
   beforeEach(() => {
     repository = new UserInMemoryRepository();
-    createUser = new CreateUser(repository);
+    useCase = new CreateUser(repository);
   });
 
   it("Should create a user", async () => {
     const spyInsert = jest.spyOn(repository, "insert");
 
-    const output = await createUser.execute({
+    const output = await useCase.execute({
       name: chance.name(),
       email: chance.email(),
     });

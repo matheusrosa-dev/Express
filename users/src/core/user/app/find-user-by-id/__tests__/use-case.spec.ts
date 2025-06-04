@@ -1,23 +1,23 @@
 import { Chance } from "chance";
 import { UserInMemoryRepository } from "../../../infra/db/in-memory/user.repository";
-import { DeleteUser } from "../use-case";
+import { FindUserById } from "../use-case";
 import { UserFactory } from "../../../domain/user.factory";
 import { Uuid } from "../../../../shared/domain/value-objects";
 import { NotFoundUser } from "../../common/errors";
 
 const chance = Chance();
 
-describe("Delete User Integration Tests", () => {
-  let useCase: DeleteUser;
+describe("Find User By Id Unit Tests", () => {
+  let useCase: FindUserById;
   let repository: UserInMemoryRepository;
 
   beforeEach(() => {
     repository = new UserInMemoryRepository();
-    useCase = new DeleteUser(repository);
+    useCase = new FindUserById(repository);
   });
 
-  it("Should delete a user", async () => {
-    const spyInsert = jest.spyOn(repository, "delete");
+  it("Should find a user by id", async () => {
+    const spyInsert = jest.spyOn(repository, "findById");
 
     const user = UserFactory.create({
       name: chance.name(),
@@ -26,14 +26,19 @@ describe("Delete User Integration Tests", () => {
 
     await repository.insert(user);
 
-    await useCase.execute({
+    const output = await useCase.execute({
       id: user.id.id,
     });
 
-    const foundUser = await repository.findById(user.id);
-
     expect(spyInsert).toHaveBeenCalledTimes(1);
-    expect(foundUser).toBeNull();
+
+    expect(output).toStrictEqual({
+      id: user.id.id,
+      name: user.name,
+      email: user.email.email,
+      status: user.status,
+      createdAt: user.createdAt,
+    });
   });
 
   it("Should throw error when user is not found", async () => {

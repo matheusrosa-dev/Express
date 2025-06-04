@@ -11,7 +11,7 @@ describe("UserMySQLRepository Unit Tests", () => {
   const repository = new UserMySQLRepository();
 
   beforeEach(async () => {
-    await mysqlPool.execute("DELETE FROM users");
+    await mysqlPool.execute(`DELETE FROM ${repository.tableName}`);
   });
 
   it("Should insert a new user", async () => {

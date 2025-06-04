@@ -1,19 +1,19 @@
 import { Chance } from "chance";
-import { UserInMemoryRepository } from "../../../infra/db/in-memory/user.repository";
 import { DeleteUser } from "../use-case";
 import { UserFactory } from "../../../domain/user.factory";
 import { Uuid } from "../../../../shared/domain/value-objects";
 import { NotFoundUser } from "../../common/errors";
+import { mysqlPool } from "../../../../shared/infra/db/my-sql/connection";
+import { UserMySQLRepository } from "../../../infra/db/my-sql/user.repository";
 
 const chance = Chance();
 
 describe("Delete User Integration Tests", () => {
-  let useCase: DeleteUser;
-  let repository: UserInMemoryRepository;
+  const repository = new UserMySQLRepository();
+  const useCase = new DeleteUser(repository);
 
   beforeEach(() => {
-    repository = new UserInMemoryRepository();
-    useCase = new DeleteUser(repository);
+    mysqlPool.execute(`DELETE FROM ${repository.tableName}`);
   });
 
   it("Should delete a user", async () => {
@@ -40,5 +40,9 @@ describe("Delete User Integration Tests", () => {
     await expect(() => useCase.execute({ id: new Uuid().id })).rejects.toThrow(
       new NotFoundUser()
     );
+  });
+
+  afterAll(async () => {
+    await mysqlPool.end();
   });
 });
