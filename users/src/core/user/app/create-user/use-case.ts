@@ -2,7 +2,11 @@ import { IUseCase } from "../../../shared/application/interfaces";
 import { UserFactory } from "../../domain/user.factory";
 import { IUserRepository } from "../../domain/user.repository";
 import { UserOutput, UserOutputMapper } from "../common";
-import { Input } from "./types";
+
+type Input = {
+  name: string;
+  email: string;
+};
 
 export class CreateUser implements IUseCase<Input, UserOutput> {
   constructor(private _userRepository: IUserRepository) {}

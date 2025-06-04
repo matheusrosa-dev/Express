@@ -3,7 +3,10 @@ import { Uuid } from "../../../shared/domain/value-objects";
 import { IUserRepository } from "../../domain/user.repository";
 import { UserOutput, UserOutputMapper } from "../common";
 import { NotFoundUser } from "../common/errors";
-import { Input } from "./types";
+
+type Input = {
+  id: string;
+};
 
 export class FindUserById implements IUseCase<Input, UserOutput> {
   constructor(private _userRepository: IUserRepository) {}
