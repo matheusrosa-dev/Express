@@ -1,9 +1,6 @@
-import { Chance } from "chance";
 import { UserInMemoryRepository } from "../../../infra/db/in-memory/user.repository";
 import { FindAllUsers } from "../use-case";
 import { UserFactory } from "../../../domain/user.factory";
-
-const chance = Chance();
 
 describe("Find All Users Integration Tests", () => {
   let useCase: FindAllUsers;
@@ -17,14 +14,7 @@ describe("Find All Users Integration Tests", () => {
   it("Should find all users", async () => {
     const spyInsert = jest.spyOn(repository, "findAll");
 
-    const users = Array(5)
-      .fill(null)
-      .map(() =>
-        UserFactory.create({
-          name: chance.name(),
-          email: chance.email(),
-        })
-      );
+    const users = UserFactory.fake().many(5).build();
 
     await Promise.all(users.map((user) => repository.insert(user)));
 

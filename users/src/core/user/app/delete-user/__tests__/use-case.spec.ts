@@ -1,11 +1,8 @@
-import { Chance } from "chance";
 import { UserInMemoryRepository } from "../../../infra/db/in-memory/user.repository";
 import { DeleteUser } from "../use-case";
 import { UserFactory } from "../../../domain/user.factory";
 import { Uuid } from "../../../../shared/domain/value-objects";
 import { NotFoundUser } from "../../common/errors";
-
-const chance = Chance();
 
 describe("Delete User Integration Tests", () => {
   let useCase: DeleteUser;
@@ -19,10 +16,7 @@ describe("Delete User Integration Tests", () => {
   it("Should delete a user", async () => {
     const spyInsert = jest.spyOn(repository, "delete");
 
-    const user = UserFactory.create({
-      name: chance.name(),
-      email: chance.email(),
-    });
+    const user = UserFactory.fake().one().build();
 
     await repository.insert(user);
 

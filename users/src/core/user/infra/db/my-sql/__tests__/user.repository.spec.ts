@@ -15,10 +15,7 @@ describe("UserMySQLRepository Unit Tests", () => {
   });
 
   it("Should insert a new user", async () => {
-    const user = UserFactory.create({
-      name: chance.name(),
-      email: chance.email(),
-    });
+    const user = UserFactory.fake().one().build();
 
     const createdUser = await repository.insert(user);
 
@@ -26,10 +23,7 @@ describe("UserMySQLRepository Unit Tests", () => {
   });
 
   it("Should delete a user", async () => {
-    const user = UserFactory.create({
-      name: chance.name(),
-      email: chance.email(),
-    });
+    const user = UserFactory.fake().one().build();
 
     const createdUser = await repository.insert(user);
 
@@ -41,10 +35,7 @@ describe("UserMySQLRepository Unit Tests", () => {
   });
 
   it("Should update a user", async () => {
-    const user = UserFactory.create({
-      name: chance.name(),
-      email: chance.email(),
-    });
+    const user = UserFactory.fake().one().build();
 
     await repository.insert(user);
 
@@ -60,14 +51,7 @@ describe("UserMySQLRepository Unit Tests", () => {
   });
 
   it("Should find all users", async () => {
-    const users = Array(5)
-      .fill(null)
-      .map(() =>
-        UserFactory.create({
-          name: chance.name(),
-          email: chance.email(),
-        })
-      );
+    const users = UserFactory.fake().many(5).build();
 
     await Promise.all(users.map((user) => repository.insert(user)));
 

@@ -1,25 +1,30 @@
 import kleur from "kleur";
-import { User } from "../app/users/entities";
-import { UsersRepository } from "../app/users/repositories";
-import { usersSeed } from "../db/seeds";
-import { pool } from "../shared/config/db";
+import { mysqlPool } from "../connection";
+import { UserMySQLRepository } from "../../../../../user/infra/db/my-sql/user.repository";
+import { UserFactory } from "../../../../../user/domain/user.factory";
 
-const usersRepository = new UsersRepository();
+const usersRepository = new UserMySQLRepository();
 
 async function seedDatabase() {
   try {
     console.log("Clearing existing users data...");
 
-    await pool.query(`DELETE FROM users`);
-    await pool.query(`ALTER TABLE users AUTO_INCREMENT = 1`);
+    console.log(`DELETE FROM ${usersRepository.tableName}`);
+
+    await mysqlPool.query(`DELETE FROM ${usersRepository.tableName}`);
+    await mysqlPool.query(
+      `ALTER TABLE ${usersRepository.tableName} AUTO_INCREMENT = 1`
+    );
 
     console.log("Inserting new users...");
 
     await Promise.all(
-      usersSeed.map(async (userDto) => {
-        const entity = new User(userDto);
-        return usersRepository.create(entity);
-      })
+      UserFactory.fake()
+        .many(5)
+        .build()
+        .map(async (user) => {
+          return usersRepository.insert(user);
+        })
     );
 
     console.log(kleur.bgGreen("Users inserted successfully."));
@@ -27,7 +32,7 @@ async function seedDatabase() {
     console.error(error);
     process.exit(1);
   } finally {
-    await pool.end();
+    await mysqlPool.end();
   }
 }
 

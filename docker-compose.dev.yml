@@ -28,16 +28,16 @@ services:
   #   networks:
   #     - microservices
 
-  # db-users:
-  #   image: mysql:8.0-debian
-  #   container_name: db-users
-  #   ports:
-  #     - 3307:3306
-  #   environment:
-  #     - MYSQL_DATABASE=db-users
-  #     - MYSQL_ROOT_PASSWORD=root
-  #   networks:
-  #     - microservices
+  db-users:
+    image: mysql:8.0-debian
+    container_name: db-users
+    ports:
+      - 3307:3306
+    environment:
+      - MYSQL_DATABASE=db-users
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      - microservices
 
   db-users-test:
     image: mysql:8.0-debian

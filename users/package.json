@@ -7,7 +7,8 @@
     "dev": "tsx watch src/express/main.ts",
     "migrate": "tsx ./src/core/shared/infra/db/my-sql/scripts/migrate.ts",
     "migrate:test": "NODE_ENV=test tsx ./src/core/shared/infra/db/my-sql/scripts/migrate.ts",
-    "test": "jest"
+    "test": "jest",
+    "seed": "tsx ./src/core/shared/infra/db/my-sql/scripts/seed.ts"
   },
   "author": "",
   "license": "ISC",

@@ -1,12 +1,9 @@
-import { Chance } from "chance";
 import { DeleteUser } from "../use-case";
 import { UserFactory } from "../../../domain/user.factory";
 import { Uuid } from "../../../../shared/domain/value-objects";
 import { NotFoundUser } from "../../common/errors";
 import { mysqlPool } from "../../../../shared/infra/db/my-sql/connection";
 import { UserMySQLRepository } from "../../../infra/db/my-sql/user.repository";
-
-const chance = Chance();
 
 describe("Delete User Integration Tests", () => {
   const repository = new UserMySQLRepository();
@@ -19,10 +16,7 @@ describe("Delete User Integration Tests", () => {
   it("Should delete a user", async () => {
     const spyInsert = jest.spyOn(repository, "delete");
 
-    const user = UserFactory.create({
-      name: chance.name(),
-      email: chance.email(),
-    });
+    const user = UserFactory.fake().one().build();
 
     await repository.insert(user);
 

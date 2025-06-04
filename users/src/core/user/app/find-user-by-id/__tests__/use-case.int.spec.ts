@@ -1,12 +1,9 @@
-import { Chance } from "chance";
 import { FindUserById } from "../use-case";
 import { UserFactory } from "../../../domain/user.factory";
 import { Uuid } from "../../../../shared/domain/value-objects";
 import { NotFoundUser } from "../../common/errors";
 import { UserMySQLRepository } from "../../../infra/db/my-sql/user.repository";
 import { mysqlPool } from "../../../../shared/infra/db/my-sql/connection";
-
-const chance = Chance();
 
 describe("Find User By Id Integration Tests", () => {
   const repository = new UserMySQLRepository();
@@ -19,10 +16,7 @@ describe("Find User By Id Integration Tests", () => {
   it("Should find a user by id", async () => {
     const spyInsert = jest.spyOn(repository, "findById");
 
-    const user = UserFactory.create({
-      name: chance.name(),
-      email: chance.email(),
-    });
+    const user = UserFactory.fake().one().build();
 
     await repository.insert(user);
 
