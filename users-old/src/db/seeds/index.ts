@@ -1,1 +1,0 @@
-export { usersSeed } from "./users";
