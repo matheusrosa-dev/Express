@@ -3,6 +3,8 @@ import { CreateUser } from "../use-case";
 import { UserMySQLRepository } from "../../../../infra/user/db/my-sql/user.repository";
 import { mysqlPool } from "../../../../shared/infra/db/my-sql/connection";
 import { Uuid } from "../../../../shared/domain/value-objects";
+import { UserFactory } from "../../../../domain/user/user.factory";
+import { ConflictUser } from "../../common/errors";
 
 const chance = Chance();
 
@@ -33,6 +35,19 @@ describe("Create User Integration Tests", () => {
       status: foundUser?.status,
       createdAt: foundUser?.createdAt,
     });
+  });
+
+  it("Should throw an error when user already exists", async () => {
+    const user = UserFactory.fake().one().build();
+
+    await repository.insert(user);
+
+    await expect(
+      useCase.execute({
+        name: user.name,
+        email: user.email.email,
+      })
+    ).rejects.toThrow(new ConflictUser());
   });
 
   afterAll(async () => {

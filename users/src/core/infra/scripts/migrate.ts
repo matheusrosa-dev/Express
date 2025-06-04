@@ -2,7 +2,7 @@ import { PoolConnection } from "mysql2/promise";
 import path from "path";
 import fs from "fs/promises";
 import kleur from "kleur";
-import { mysqlPool } from "../connection";
+import { mysqlPool } from "../../shared/infra/db/my-sql/connection";
 
 const MIGRATIONS_DIR = path.join(__dirname, "..", "migrations");
 

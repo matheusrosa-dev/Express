@@ -1,4 +1,4 @@
-import { IUserRepository } from "../../../domain/user/user.repository";
+import { IUserRepository } from "../../../domain/user/interfaces";
 import { IUseCase } from "../../../shared/app/interfaces";
 import { UserOutput, UserOutputMapper } from "../common";
 

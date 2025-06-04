@@ -1,5 +1,10 @@
-export class InvalidUser extends Error {
+import { DomainError } from "../../../shared/domain/classes";
+
+export class InvalidUser extends DomainError {
   constructor() {
-    super("User is not valid");
+    super({
+      message: "Invalid user",
+      statusCode: 400,
+    });
   }
 }

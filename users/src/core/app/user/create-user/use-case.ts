@@ -1,7 +1,8 @@
+import { IUserRepository } from "../../../domain/user/interfaces";
 import { UserFactory } from "../../../domain/user/user.factory";
-import { IUserRepository } from "../../../domain/user/user.repository";
 import { IUseCase } from "../../../shared/app/interfaces";
 import { UserOutput, UserOutputMapper } from "../common";
+import { ConflictUser } from "../common/errors";
 
 type Input = {
   name: string;
@@ -13,6 +14,12 @@ export class CreateUser implements IUseCase<Input, UserOutput> {
 
   async execute(input: Input) {
     const user = UserFactory.create(input);
+
+    const foundUser = await this._userRepository.findByEmail(user.email);
+
+    if (foundUser) {
+      throw new ConflictUser();
+    }
 
     await this._userRepository.insert(user);
 

@@ -1,8 +1,8 @@
 import { Model, ModelMapper } from "./user-model.mapper";
-import { Uuid } from "../../../../shared/domain/value-objects";
+import { Email, Uuid } from "../../../../shared/domain/value-objects";
 import { mysqlPool } from "../../../../shared/infra/db/my-sql/connection";
-import { IUserRepository } from "../../../../domain/user/user.repository";
 import { User } from "../../../../domain/user/user.entity";
+import { IUserRepository } from "../../../../domain/user/interfaces";
 
 export class UserMySQLRepository implements IUserRepository {
   private _tableName = "users";
@@ -28,6 +28,21 @@ export class UserMySQLRepository implements IUserRepository {
     const user = await this.findById(entity.id);
 
     return user!;
+  }
+
+  async findByEmail(email: Email) {
+    const [rows] = await mysqlPool.execute(
+      `SELECT * FROM ${this._tableName} WHERE email = ?`,
+      [email.email]
+    );
+
+    const model = (rows as Model[])[0];
+
+    if (!model) return null;
+
+    const user = ModelMapper.toEntity(model);
+
+    return user;
   }
 
   async findById(id: Uuid) {

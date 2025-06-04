@@ -50,6 +50,16 @@ describe("UserMySQLRepository Unit Tests", () => {
     expect(updatedUser).toStrictEqual(user);
   });
 
+  it("Should find a user by email", async () => {
+    const user = UserFactory.fake().one().build();
+
+    await repository.insert(user);
+
+    const foundUser = await repository.findByEmail(user.email);
+
+    expect(foundUser).toStrictEqual(user);
+  });
+
   it("Should find all users", async () => {
     const users = UserFactory.fake().many(5).build();
 

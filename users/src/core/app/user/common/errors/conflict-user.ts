@@ -1,10 +1,10 @@
 import { DomainError } from "../../../../shared/domain/classes";
 
-export class NotFoundUser extends DomainError {
+export class ConflictUser extends DomainError {
   constructor() {
     super({
-      message: "User not found",
-      statusCode: 404,
+      message: "User already exists",
+      statusCode: 409,
     });
   }
 }
