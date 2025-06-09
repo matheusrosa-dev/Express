@@ -4,9 +4,10 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/main.js",
-    "dev": "tsx watch src/main.ts",
-    "migrate": "tsx ./src/scripts/migrate.ts",
-    "seed": "tsx ./src/scripts/seed.ts"
+    "dev": "tsx watch src/express/main.ts",
+    "test:unit": "jest unit.spec.ts$",
+    "test:int": "jest int.spec.ts$ --runInBand",
+    "test": "npm run test:unit && npm run test:int"
   },
   "author": "",
   "license": "ISC",
@@ -14,12 +15,23 @@
   "dependencies": {
     "express": "^4.21.2",
     "kleur": "^4.1.5",
+    "lodash": "^4.17.21",
     "mysql2": "^3.14.0",
+    "uuid": "^11.1.0",
     "zod": "^3.25.30"
   },
   "devDependencies": {
+    "@babel/core": "^7.27.4",
+    "@babel/preset-env": "^7.27.2",
+    "@babel/preset-typescript": "^7.27.1",
+    "@types/chance": "^1.1.6",
     "@types/express": "^5.0.1",
+    "@types/jest": "^29.5.14",
+    "@types/lodash": "^4.17.17",
     "@types/node": "^22.13.14",
+    "babel-jest": "^30.0.0-beta.3",
+    "chance": "^1.1.13",
+    "jest": "^29.7.0",
     "tsx": "^4.19.3",
     "typescript": "^5.8.2"
   }

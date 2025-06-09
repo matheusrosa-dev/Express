@@ -2,9 +2,6 @@ Adicionar CRON
 Adicionar MS de email
 kafka ou rabbitmq
 Adicionar login?
-implementar soft delete
 
 URGENTE
-adicionar validação nas entidades
 remover promise all
-adicionar testes
