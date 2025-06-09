@@ -2,7 +2,7 @@ import { Chance } from "chance";
 import { UserInMemoryRepository } from "../../../../infra/user/db/in-memory/user.repository";
 import { CreateUser } from "../use-case";
 import { UserFactory } from "../../../../domain/user/user.factory";
-import { UserConflict } from "../../common/errors";
+import { UserConflictError } from "../../common/errors";
 
 const chance = Chance();
 
@@ -46,6 +46,6 @@ describe("Create User Unit Tests", () => {
         name: user.name,
         email: user.email.email,
       })
-    ).rejects.toThrow(new UserConflict());
+    ).rejects.toThrow(new UserConflictError());
   });
 });

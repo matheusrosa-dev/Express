@@ -1,22 +1,19 @@
 import { ModelMapper } from "./product-model.mapper";
 import { Uuid } from "../../../../shared/domain/value-objects";
-import { TypeORM } from "../../../../shared/infra/db/typeorm/connection";
 import { IProductRepository } from "../../../../domain/product/interfaces";
-import { ProductModel } from "../../../../shared/infra/db/typeorm/models";
 import { Product } from "../../../../domain/product/product.entity";
+import { Repository } from "typeorm";
+import { ProductModel } from "./models";
 
 export class ProductTypeORMRepository implements IProductRepository {
-  private connection = TypeORM.connection.getRepository(ProductModel);
+  constructor(private readonly connection: Repository<ProductModel>) {}
 
   async insert(entity: Product) {
     const model = ModelMapper.toModel(entity);
 
-    const a = await this.connection.save(model);
-    console.log(a);
+    const product = await this.connection.save(model);
 
-    const product = await this.findById(entity.id);
-
-    return product!;
+    return ModelMapper.toEntity(product);
   }
 
   async findById(id: Uuid) {
@@ -34,7 +31,16 @@ export class ProductTypeORMRepository implements IProductRepository {
   }
 
   async update(entity: Product): Promise<Product> {
-    throw new Error("Method not implemented.");
+    const model = ModelMapper.toModel(entity);
+
+    // @ts-expect-error - ID must not be updated
+    delete model.id;
+
+    await this.connection.update({ id: entity.id.id }, model);
+
+    const updatedProduct = await this.findById(entity.id);
+
+    return updatedProduct!;
   }
 
   async findAll() {

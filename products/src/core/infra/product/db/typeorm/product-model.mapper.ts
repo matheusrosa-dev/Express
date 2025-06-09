@@ -1,6 +1,6 @@
 import { Product } from "../../../../domain/product/product.entity";
 import { Uuid } from "../../../../shared/domain/value-objects";
-import { ProductModel } from "../../../../shared/infra/db/typeorm/models";
+import { ProductModel } from "./models";
 
 export class ModelMapper {
   static toModel(product: Product): ProductModel {
@@ -22,7 +22,7 @@ export class ModelMapper {
       name: model.name,
       description: model.description,
       stock: model.stock,
-      price: model.price,
+      price: Number(model.price),
       createdAt: model.created_at,
     });
 

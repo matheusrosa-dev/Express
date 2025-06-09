@@ -8,6 +8,17 @@ services:
     networks:
       - microservices
 
+  db-products-test:
+    image: mysql:8.0-debian
+    container_name: db-products-test
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_DATABASE=db-products-test
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      - microservices
+
   # db-products:
   #   image: mysql:8.0-debian
   #   container_name: db-products
@@ -19,14 +30,14 @@ services:
   #   networks:
   #     - microservices
 
-  # api-products:
-  #   image: node:22
-  #   entrypoint: tail -f /dev/null
-  #   container_name: api-products
-  #   volumes:
-  #     - ./products:/app
-  #   networks:
-  #     - microservices
+  api-products:
+    image: node:22
+    entrypoint: tail -f /dev/null
+    container_name: api-products
+    volumes:
+      - ./products:/app
+    networks:
+      - microservices
 
   db-users:
     image: mysql:8.0-debian

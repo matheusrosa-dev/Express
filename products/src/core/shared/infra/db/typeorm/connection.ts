@@ -1,13 +1,11 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-import { ProductModel } from "./models";
 
 class Config {
   static db() {
     if (process.env.NODE_ENV === "test") {
       return {
-        // host: "db-products-test",
-        host: "localhost",
+        host: "db-products-test",
         port: 3306,
         username: "root",
         database: "db-products-test",
@@ -27,11 +25,15 @@ class Config {
 }
 
 export class TypeORM {
-  static connection = new DataSource({
-    type: "mysql",
-    synchronize: true,
-    entities: [ProductModel],
+  readonly connection: DataSource;
 
-    ...Config.db(),
-  });
+  constructor(props: { models: Function[] }) {
+    this.connection = new DataSource({
+      type: "mysql",
+      synchronize: true,
+      entities: props.models,
+
+      ...Config.db(),
+    });
+  }
 }

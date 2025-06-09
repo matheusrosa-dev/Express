@@ -19,6 +19,6 @@ export class ProductModel {
   @Column("decimal", { precision: 10, scale: 2 })
   price!: number;
 
-  @Column({ type: "timestamp" })
+  @Column({ type: "timestamp", precision: 3 })
   created_at!: Date;
 }
