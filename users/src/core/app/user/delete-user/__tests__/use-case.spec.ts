@@ -1,7 +1,7 @@
 import { UserInMemoryRepository } from "../../../../infra/user/db/in-memory/user.repository";
 import { DeleteUser } from "../use-case";
 import { Uuid } from "../../../../shared/domain/value-objects";
-import { NotFoundUser } from "../../common/errors";
+import { UserNotFoundError } from "../../common/errors";
 import { UserFactory } from "../../../../domain/user/user.factory";
 
 describe("Delete User Integration Tests", () => {
@@ -32,7 +32,7 @@ describe("Delete User Integration Tests", () => {
 
   it("Should throw error when user is not found", async () => {
     await expect(() => useCase.execute({ id: new Uuid().id })).rejects.toThrow(
-      new NotFoundUser()
+      new UserNotFoundError()
     );
   });
 });

@@ -2,7 +2,7 @@ import { Chance } from "chance";
 import { Email, Uuid } from "../../../shared/domain/value-objects";
 import { User } from "../user.entity";
 import { Status } from "../enums";
-import { InvalidUser } from "../errors";
+import { UserInvalidError } from "../errors";
 
 const chance = Chance();
 describe("User Unit Tests", () => {
@@ -37,7 +37,7 @@ describe("User Unit Tests", () => {
       createdAt: null as unknown as Date,
     });
 
-    expect(() => user.validate()).toThrow(new InvalidUser());
+    expect(() => user.validate()).toThrow(new UserInvalidError());
   });
 
   it("Should convert to JSON", () => {

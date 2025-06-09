@@ -2,10 +2,10 @@ import * as uuid from "uuid";
 import { ValueObject } from "./value-object";
 import { DomainError } from "../classes";
 
-export class InvalidUuidError extends DomainError {
+export class UuidInvalidError extends DomainError {
   constructor() {
     super({
-      message: "Invalid uuid",
+      message: "Uuid is invalid",
       statusCode: 400,
     });
   }
@@ -24,7 +24,7 @@ export class Uuid extends ValueObject {
     const isValid = uuid.validate(this.id);
 
     if (!isValid) {
-      throw new InvalidUuidError();
+      throw new UuidInvalidError();
     }
   }
 }

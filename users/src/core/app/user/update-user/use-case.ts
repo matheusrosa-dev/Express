@@ -2,7 +2,7 @@ import { IUserRepository } from "../../../domain/user/interfaces";
 import { IUseCase } from "../../../shared/app/interfaces";
 import { Email, Uuid } from "../../../shared/domain/value-objects";
 import { UserOutput, UserOutputMapper } from "../common";
-import { NotFoundUser } from "../common/errors";
+import { UserNotFoundError } from "../common/errors";
 
 type Input = {
   id: string;
@@ -17,7 +17,7 @@ export class UpdateUser implements IUseCase<Input, UserOutput> {
     const user = await this._userRepository.findById(new Uuid(input.id));
 
     if (!user) {
-      throw new NotFoundUser();
+      throw new UserNotFoundError();
     }
 
     user.update({

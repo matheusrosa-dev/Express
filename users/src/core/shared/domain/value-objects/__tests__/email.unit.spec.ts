@@ -1,4 +1,4 @@
-import { InvalidEmailError, Email } from "..";
+import { EmailInvalidError, Email } from "..";
 import { Chance } from "chance";
 import { validateEmail } from "../../utils";
 
@@ -15,11 +15,11 @@ describe("Email Unit Tests", () => {
   });
 
   it("Should throw an error when email is invalid", () => {
-    expect(() => new Email("invalid-email")).toThrow(new InvalidEmailError());
-    expect(() => new Email("invalid@email")).toThrow(new InvalidEmailError());
-    expect(() => new Email("@email.com")).toThrow(new InvalidEmailError());
+    expect(() => new Email("invalid-email")).toThrow(new EmailInvalidError());
+    expect(() => new Email("invalid@email")).toThrow(new EmailInvalidError());
+    expect(() => new Email("@email.com")).toThrow(new EmailInvalidError());
     expect(() => new Email("invalid-email.com")).toThrow(
-      new InvalidEmailError()
+      new EmailInvalidError()
     );
 
     expect(validateSpy).toHaveBeenCalledTimes(4);

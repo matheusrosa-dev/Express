@@ -1,7 +1,7 @@
 import { Email, Uuid } from "../../shared/domain/value-objects";
 import { IEntity } from "../../shared/domain/interfaces";
 import { Status } from "./enums";
-import { InvalidUser } from "./errors";
+import { UserInvalidError } from "./errors";
 import { UserConstructor } from "./types";
 import { z } from "zod";
 
@@ -30,7 +30,7 @@ export class User implements IEntity<Uuid> {
     const { success: isValid } = schema.safeParse(this);
 
     if (!isValid) {
-      throw new InvalidUser();
+      throw new UserInvalidError();
     }
   }
 

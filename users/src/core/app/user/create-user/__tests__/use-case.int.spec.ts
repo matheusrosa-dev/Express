@@ -4,7 +4,7 @@ import { UserMySQLRepository } from "../../../../infra/user/db/my-sql/user.repos
 import { mysqlPool } from "../../../../shared/infra/db/my-sql/connection";
 import { Uuid } from "../../../../shared/domain/value-objects";
 import { UserFactory } from "../../../../domain/user/user.factory";
-import { ConflictUser } from "../../common/errors";
+import { UserConflict } from "../../common/errors";
 
 const chance = Chance();
 
@@ -47,7 +47,7 @@ describe("Create User Integration Tests", () => {
         name: user.name,
         email: user.email.email,
       })
-    ).rejects.toThrow(new ConflictUser());
+    ).rejects.toThrow(new UserConflict());
   });
 
   afterAll(async () => {

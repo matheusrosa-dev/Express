@@ -2,7 +2,7 @@ import { IUserRepository } from "../../../domain/user/interfaces";
 import { UserFactory } from "../../../domain/user/user.factory";
 import { IUseCase } from "../../../shared/app/interfaces";
 import { UserOutput, UserOutputMapper } from "../common";
-import { ConflictUser } from "../common/errors";
+import { UserConflict } from "../common/errors";
 
 type Input = {
   name: string;
@@ -18,7 +18,7 @@ export class CreateUser implements IUseCase<Input, UserOutput> {
     const foundUser = await this._userRepository.findByEmail(user.email);
 
     if (foundUser) {
-      throw new ConflictUser();
+      throw new UserConflict();
     }
 
     await this._userRepository.insert(user);

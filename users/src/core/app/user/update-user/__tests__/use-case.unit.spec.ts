@@ -2,7 +2,7 @@ import { Chance } from "chance";
 import { UserInMemoryRepository } from "../../../../infra/user/db/in-memory/user.repository";
 import { UpdateUser } from "../use-case";
 import { UserFactory } from "../../../../domain/user/user.factory";
-import { NotFoundUser } from "../../common/errors";
+import { UserNotFoundError } from "../../common/errors";
 import { Email } from "../../../../shared/domain/value-objects";
 
 const chance = Chance();
@@ -55,6 +55,6 @@ describe("Update User Unit Tests", () => {
         name: user.name,
         email: user.email.email,
       })
-    ).rejects.toThrow(new NotFoundUser());
+    ).rejects.toThrow(new UserNotFoundError());
   });
 });

@@ -1,6 +1,6 @@
 import { DomainError } from "../../../../shared/domain/classes";
 
-export class NotFoundUser extends DomainError {
+export class UserNotFoundError extends DomainError {
   constructor() {
     super({
       message: "User not found",

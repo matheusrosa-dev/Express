@@ -1,9 +1,9 @@
 import { DomainError } from "../../../shared/domain/classes";
 
-export class InvalidUser extends DomainError {
+export class UserInvalidError extends DomainError {
   constructor() {
     super({
-      message: "Invalid user",
+      message: "User is invalid",
       statusCode: 400,
     });
   }

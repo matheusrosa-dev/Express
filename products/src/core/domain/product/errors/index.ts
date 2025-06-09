@@ -1,1 +1,1 @@
-export { InvalidProduct } from "./invalid-product";
+export { ProductInvalid } from "./product-invalid";

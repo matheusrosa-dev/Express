@@ -4,7 +4,7 @@ import { UserMySQLRepository } from "../../../../infra/user/db/my-sql/user.repos
 import { mysqlPool } from "../../../../shared/infra/db/my-sql/connection";
 import { Email, Uuid } from "../../../../shared/domain/value-objects";
 import { UserFactory } from "../../../../domain/user/user.factory";
-import { NotFoundUser } from "../../common/errors";
+import { UserNotFoundError } from "../../common/errors";
 
 const chance = Chance();
 
@@ -55,7 +55,7 @@ describe("Update User Integration Tests", () => {
         name: user.name,
         email: user.email.email,
       })
-    ).rejects.toThrow(new NotFoundUser());
+    ).rejects.toThrow(new UserNotFoundError());
   });
 
   afterAll(async () => {

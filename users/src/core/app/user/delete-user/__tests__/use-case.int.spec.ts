@@ -1,6 +1,6 @@
 import { DeleteUser } from "../use-case";
 import { Uuid } from "../../../../shared/domain/value-objects";
-import { NotFoundUser } from "../../common/errors";
+import { UserNotFoundError } from "../../common/errors";
 import { mysqlPool } from "../../../../shared/infra/db/my-sql/connection";
 import { UserMySQLRepository } from "../../../../infra/user/db/my-sql/user.repository";
 import { UserFactory } from "../../../../domain/user/user.factory";
@@ -32,7 +32,7 @@ describe("Delete User Integration Tests", () => {
 
   it("Should throw error when user is not found", async () => {
     await expect(() => useCase.execute({ id: new Uuid().id })).rejects.toThrow(
-      new NotFoundUser()
+      new UserNotFoundError()
     );
   });
 

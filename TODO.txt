@@ -5,3 +5,5 @@ Adicionar login?
 
 URGENTE
 remover promise all
+remover babel do users
+alterar o mysqlpool do users

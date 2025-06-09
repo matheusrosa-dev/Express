@@ -1,7 +1,7 @@
 import { IUserRepository } from "../../../domain/user/interfaces";
 import { IUseCase } from "../../../shared/app/interfaces";
 import { Uuid } from "../../../shared/domain/value-objects";
-import { NotFoundUser } from "../common/errors";
+import { UserNotFoundError } from "../common/errors";
 
 type Input = {
   id: string;
@@ -16,7 +16,7 @@ export class DeleteUser implements IUseCase<Input, void> {
     const foundUser = await this._userRepository.findById(id);
 
     if (!foundUser) {
-      throw new NotFoundUser();
+      throw new UserNotFoundError();
     }
 
     await this._userRepository.delete(id);

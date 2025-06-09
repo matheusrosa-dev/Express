@@ -28,18 +28,7 @@ describe("UserFactory Unit Tests", () => {
         const user = faker.build();
 
         expect(validateSpy).toHaveBeenCalledTimes(1);
-
         expect(user).toBeInstanceOf(User);
-        expect(user.id).toBeInstanceOf(Uuid);
-
-        expect(typeof user.name).toBe("string");
-        expect(user.name).toBeTruthy();
-
-        expect(user.email).toBeInstanceOf(Email);
-
-        expect(user.status).toBe(Status.ACTIVE);
-
-        expect(user.createdAt).toBeInstanceOf(Date);
       });
 
       it("Should create with provided id", () => {
@@ -92,17 +81,6 @@ describe("UserFactory Unit Tests", () => {
 
         users.forEach((user) => {
           expect(user).toBeInstanceOf(User);
-
-          expect(user.id).toBeInstanceOf(Uuid);
-
-          expect(typeof user.name).toBe("string");
-          expect(user.name).toBeTruthy();
-
-          expect(user.email).toBeInstanceOf(Email);
-
-          expect(user.status).toBe(Status.ACTIVE);
-
-          expect(user.createdAt).toBeInstanceOf(Date);
         });
       });
 

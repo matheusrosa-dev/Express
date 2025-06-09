@@ -1,2 +1,2 @@
-export { NotFoundUser } from "./not-found-user";
-export { ConflictUser } from "./conflict-user";
+export { UserNotFoundError } from "./user-not-found";
+export { UserConflictError } from "./user-conflict";

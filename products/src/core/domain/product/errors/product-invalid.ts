@@ -1,9 +1,9 @@
 import { DomainError } from "../../../shared/domain/classes";
 
-export class InvalidProduct extends DomainError {
+export class ProductInvalid extends DomainError {
   constructor() {
     super({
-      message: "Invalid product",
+      message: "Product is invalid",
       statusCode: 400,
     });
   }

@@ -1,15 +1,9 @@
 services:
   db-products:
     image: mysql:8.0-debian
-    container_name: db-products
+    container_name: db-products-test
     ports:
       - 3306:3306
     environment:
-      - MYSQL_DATABASE=db-products
+      - MYSQL_DATABASE=db-products-test
       - MYSQL_ROOT_PASSWORD=root
-    networks:
-      - microservices
-
-networks:
-  microservices:
-    driver: bridge

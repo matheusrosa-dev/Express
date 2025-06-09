@@ -1,6 +1,6 @@
 import { IEntity } from "../../shared/domain/interfaces";
 import { Uuid } from "../../shared/domain/value-objects";
-import { InvalidProduct } from "./errors";
+import { ProductInvalid } from "./errors";
 import { ProductConstructor } from "./types";
 import { z } from "zod";
 
@@ -33,7 +33,7 @@ export class Product implements IEntity<Uuid> {
     const { success: isValid } = schema.safeParse(this);
 
     if (!isValid) {
-      throw new InvalidProduct();
+      throw new ProductInvalid();
     }
   }
 

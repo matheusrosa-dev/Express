@@ -2,10 +2,10 @@ import { DomainError } from "../classes";
 import { validateEmail } from "../utils";
 import { ValueObject } from "./value-object";
 
-export class InvalidEmailError extends DomainError {
+export class EmailInvalidError extends DomainError {
   constructor() {
     super({
-      message: "Invalid email",
+      message: "Email is invalid",
       statusCode: 400,
     });
   }
@@ -24,7 +24,7 @@ export class Email extends ValueObject {
     const isValid = validateEmail(this.email);
 
     if (!isValid) {
-      throw new InvalidEmailError();
+      throw new EmailInvalidError();
     }
   }
 }
