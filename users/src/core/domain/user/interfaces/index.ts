@@ -1,1 +1,1 @@
-export { IUserRepository } from "./repository";
+export type { IUserRepository } from "./repository";

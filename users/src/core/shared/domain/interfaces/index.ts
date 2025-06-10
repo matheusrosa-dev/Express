@@ -1,2 +1,2 @@
-export { IRepository } from "./repository";
-export { IEntity } from "./entity";
+export type { IRepository } from "./repository";
+export type { IEntity } from "./entity";

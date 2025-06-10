@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/main.js",
+    "start": "node dist/express/main.js",
     "dev": "tsx watch src/express/main.ts",
     "test:unit": "jest unit.spec.ts$",
     "test:int": "jest int.spec.ts$ --runInBand",
