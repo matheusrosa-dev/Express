@@ -1,11 +1,13 @@
 import { Model, ModelMapper } from "./user-model.mapper";
 import { Email, Uuid } from "../../../../shared/domain/value-objects";
-import { mysqlPool } from "../../../../shared/infra/db/my-sql/connection";
 import { User } from "../../../../domain/user/user.entity";
 import { IUserRepository } from "../../../../domain/user/interfaces";
+import mysql from "mysql2/promise";
 
 export class UserMySQLRepository implements IUserRepository {
   private _tableName = "users";
+
+  constructor(private readonly connection: mysql.Pool) {}
 
   get tableName() {
     return this._tableName;
@@ -18,7 +20,7 @@ export class UserMySQLRepository implements IUserRepository {
     const placeholders = columns.map(() => "?").join(", ");
     const values = Object.values(model);
 
-    await mysqlPool.execute(
+    await this.connection.execute(
       `INSERT INTO ${this._tableName} (${columns.join(
         ", "
       )}) VALUES (${placeholders})`,
@@ -31,7 +33,7 @@ export class UserMySQLRepository implements IUserRepository {
   }
 
   async findByEmail(email: Email) {
-    const [rows] = await mysqlPool.execute(
+    const [rows] = await this.connection.execute(
       `SELECT * FROM ${this._tableName} WHERE email = ?`,
       [email.email]
     );
@@ -46,7 +48,7 @@ export class UserMySQLRepository implements IUserRepository {
   }
 
   async findById(id: Uuid) {
-    const [rows] = await mysqlPool.execute(
+    const [rows] = await this.connection.execute(
       `SELECT * FROM ${this._tableName} WHERE id = ?`,
       [id.id]
     );
@@ -70,7 +72,7 @@ export class UserMySQLRepository implements IUserRepository {
     const setClause = columns.map((col) => `${col} = ?`).join(", ");
     const values = [...Object.values(model), entity.id.id];
 
-    await mysqlPool.execute(
+    await this.connection.execute(
       `UPDATE ${this._tableName} SET ${setClause} WHERE id = ?`,
       values
     );
@@ -81,7 +83,9 @@ export class UserMySQLRepository implements IUserRepository {
   }
 
   async findAll() {
-    const [rows] = await mysqlPool.execute(`SELECT * FROM ${this._tableName}`);
+    const [rows] = await this.connection.execute(
+      `SELECT * FROM ${this._tableName}`
+    );
 
     const models = rows as Model[];
 
@@ -91,8 +95,9 @@ export class UserMySQLRepository implements IUserRepository {
   }
 
   async delete(id: Uuid) {
-    await mysqlPool.execute(`DELETE FROM ${this._tableName} WHERE id = ?`, [
-      id.id,
-    ]);
+    await this.connection.execute(
+      `DELETE FROM ${this._tableName} WHERE id = ?`,
+      [id.id]
+    );
   }
 }

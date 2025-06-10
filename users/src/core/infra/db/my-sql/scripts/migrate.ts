@@ -2,7 +2,7 @@ import { PoolConnection } from "mysql2/promise";
 import path from "path";
 import fs from "fs/promises";
 import kleur from "kleur";
-import { mysqlPool } from "../../../../shared/infra/db/my-sql/connection";
+import { MySQL } from "../../../../shared/infra/db/my-sql/connection";
 
 const MIGRATIONS_DIR = path.join(__dirname, "..", "migrations");
 
@@ -25,7 +25,9 @@ async function runMigrations() {
     process.exit(1);
   }
 
-  let connection = await mysqlPool.getConnection();
+  const mySql = new MySQL();
+
+  let connection = await mySql.connection.getConnection();
 
   try {
     await connection.beginTransaction();
@@ -55,7 +57,7 @@ async function runMigrations() {
     if (connection) {
       connection.release();
     }
-    await mysqlPool.end();
+    await mySql.connection.end();
   }
 }
 

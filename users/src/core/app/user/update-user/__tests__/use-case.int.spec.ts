@@ -1,7 +1,7 @@
 import { Chance } from "chance";
 import { UpdateUser } from "../use-case";
 import { UserMySQLRepository } from "../../../../infra/user/db/my-sql/user.repository";
-import { mysqlPool } from "../../../../shared/infra/db/my-sql/connection";
+import { MySQL } from "../../../../shared/infra/db/my-sql/connection";
 import { Email, Uuid } from "../../../../shared/domain/value-objects";
 import { UserFactory } from "../../../../domain/user/user.factory";
 import { UserNotFoundError } from "../../common/errors";
@@ -9,11 +9,12 @@ import { UserNotFoundError } from "../../common/errors";
 const chance = Chance();
 
 describe("Update User Integration Tests", () => {
-  const repository = new UserMySQLRepository();
+  const mySql = new MySQL();
+  const repository = new UserMySQLRepository(mySql.connection);
   const useCase = new UpdateUser(repository);
 
   beforeEach(() => {
-    mysqlPool.execute(`DELETE FROM ${repository.tableName}`);
+    mySql.connection.execute(`DELETE FROM ${repository.tableName}`);
   });
 
   it("Should create a user", async () => {
@@ -59,6 +60,6 @@ describe("Update User Integration Tests", () => {
   });
 
   afterAll(async () => {
-    await mysqlPool.end();
+    await mySql.connection.end();
   });
 });

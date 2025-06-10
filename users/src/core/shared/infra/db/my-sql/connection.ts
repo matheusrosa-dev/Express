@@ -23,9 +23,9 @@ class Config {
 }
 
 export class MySQL {
-  static createPool() {
-    return mysql.createPool(Config.db());
+  readonly connection: mysql.Pool;
+
+  constructor() {
+    this.connection = mysql.createPool(Config.db());
   }
 }
-
-export const mysqlPool = MySQL.createPool();

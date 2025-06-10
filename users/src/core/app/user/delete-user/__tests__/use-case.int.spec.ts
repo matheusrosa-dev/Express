@@ -1,16 +1,17 @@
 import { DeleteUser } from "../use-case";
 import { Uuid } from "../../../../shared/domain/value-objects";
 import { UserNotFoundError } from "../../common/errors";
-import { mysqlPool } from "../../../../shared/infra/db/my-sql/connection";
+import { MySQL } from "../../../../shared/infra/db/my-sql/connection";
 import { UserMySQLRepository } from "../../../../infra/user/db/my-sql/user.repository";
 import { UserFactory } from "../../../../domain/user/user.factory";
 
 describe("Delete User Integration Tests", () => {
-  const repository = new UserMySQLRepository();
+  const mySql = new MySQL();
+  const repository = new UserMySQLRepository(mySql.connection);
   const useCase = new DeleteUser(repository);
 
   beforeEach(() => {
-    mysqlPool.execute(`DELETE FROM ${repository.tableName}`);
+    mySql.connection.execute(`DELETE FROM ${repository.tableName}`);
   });
 
   it("Should delete a user", async () => {
@@ -37,6 +38,6 @@ describe("Delete User Integration Tests", () => {
   });
 
   afterAll(async () => {
-    await mysqlPool.end();
+    await mySql.connection.end();
   });
 });

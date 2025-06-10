@@ -1,9 +1,10 @@
 import kleur from "kleur";
 import { UserMySQLRepository } from "../../../user/db/my-sql/user.repository";
-import { mysqlPool } from "../../../../shared/infra/db/my-sql/connection";
+import { MySQL } from "../../../../shared/infra/db/my-sql/connection";
 import { UserFactory } from "../../../../domain/user/user.factory";
 
-const usersRepository = new UserMySQLRepository();
+const mysql = new MySQL();
+const usersRepository = new UserMySQLRepository(mysql.connection);
 
 async function seedDatabase() {
   try {
@@ -11,8 +12,8 @@ async function seedDatabase() {
 
     console.log(`DELETE FROM ${usersRepository.tableName}`);
 
-    await mysqlPool.query(`DELETE FROM ${usersRepository.tableName}`);
-    await mysqlPool.query(
+    await mysql.connection.query(`DELETE FROM ${usersRepository.tableName}`);
+    await mysql.connection.query(
       `ALTER TABLE ${usersRepository.tableName} AUTO_INCREMENT = 1`
     );
 
@@ -32,7 +33,7 @@ async function seedDatabase() {
     console.error(error);
     process.exit(1);
   } finally {
-    await mysqlPool.end();
+    await mysql.connection.end();
   }
 }
 

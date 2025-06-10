@@ -1,5 +1,5 @@
 import { Chance } from "chance";
-import { mysqlPool } from "../../../../../shared/infra/db/my-sql/connection";
+import { MySQL } from "../../../../../shared/infra/db/my-sql/connection";
 import { UserMySQLRepository } from "../user.repository";
 import { Email } from "../../../../../shared/domain/value-objects";
 import { UserFactory } from "../../../../../domain/user/user.factory";
@@ -8,10 +8,11 @@ import { Status } from "../../../../../domain/user/enums";
 const chance = Chance();
 
 describe("UserMySQLRepository Unit Tests", () => {
-  const repository = new UserMySQLRepository();
+  const mySql = new MySQL();
+  const repository = new UserMySQLRepository(mySql.connection);
 
   beforeEach(async () => {
-    await mysqlPool.execute(`DELETE FROM ${repository.tableName}`);
+    await mySql.connection.execute(`DELETE FROM ${repository.tableName}`);
   });
 
   it("Should insert a new user", async () => {
@@ -72,6 +73,6 @@ describe("UserMySQLRepository Unit Tests", () => {
   });
 
   afterAll(async () => {
-    await mysqlPool.end();
+    await mySql.connection.end();
   });
 });

@@ -12,10 +12,13 @@ import {
   paramsValidationMiddleware,
 } from "../../shared/middlewares";
 import { UserService } from "./user.service";
+import { UserMySQLRepository } from "../../../core/infra/user/db/my-sql/user.repository";
+import { mySqlConnection } from "../../db/connection";
 
 const userRouter = Router();
 
-const service = new UserService();
+const repository = new UserMySQLRepository(mySqlConnection);
+const service = new UserService(repository);
 const controller = new UserController(service);
 
 userRouter.get("/", controller.findAll.bind(controller));

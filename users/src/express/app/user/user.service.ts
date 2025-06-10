@@ -1,12 +1,11 @@
 import { IUserService } from "./interfaces";
 import { CreateUserDto, UpdateUserBodyDto } from "./dtos";
 import { FindAllUsers } from "../../../core/app/user/find-all-users/use-case";
-import { UserMySQLRepository } from "../../../core/infra/user/db/my-sql/user.repository";
 import { CreateUser } from "../../../core/app/user/create-user/use-case";
 import { FindUserById } from "../../../core/app/user/find-user-by-id/use-case";
 import { DeleteUser } from "../../../core/app/user/delete-user/use-case";
-import { User } from "./types";
 import { UpdateUser } from "../../../core/app/user/update-user/use-case";
+import { IUserRepository } from "../../../core/domain/user/interfaces";
 
 export class UserService implements IUserService {
   private _findAllUsersUseCase: FindAllUsers;
@@ -15,8 +14,7 @@ export class UserService implements IUserService {
   private _deleteUserUseCase: DeleteUser;
   private _updateUserUseCase: UpdateUser;
 
-  constructor() {
-    const repository = new UserMySQLRepository();
+  constructor(repository: IUserRepository) {
     this._findAllUsersUseCase = new FindAllUsers(repository);
     this._createUserUseCase = new CreateUser(repository);
     this._findUserByIdUseCase = new FindUserById(repository);

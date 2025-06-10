@@ -2,15 +2,16 @@ import { FindUserById } from "../use-case";
 import { Uuid } from "../../../../shared/domain/value-objects";
 import { UserNotFoundError } from "../../common/errors";
 import { UserMySQLRepository } from "../../../../infra/user/db/my-sql/user.repository";
-import { mysqlPool } from "../../../../shared/infra/db/my-sql/connection";
+import { MySQL } from "../../../../shared/infra/db/my-sql/connection";
 import { UserFactory } from "../../../../domain/user/user.factory";
 
 describe("Find User By Id Integration Tests", () => {
-  const repository = new UserMySQLRepository();
+  const mySql = new MySQL();
+  const repository = new UserMySQLRepository(mySql.connection);
   const useCase = new FindUserById(repository);
 
   beforeEach(() => {
-    mysqlPool.execute(`DELETE FROM ${repository.tableName}`);
+    mySql.connection.execute(`DELETE FROM ${repository.tableName}`);
   });
 
   it("Should find a user by id", async () => {
@@ -42,6 +43,6 @@ describe("Find User By Id Integration Tests", () => {
   });
 
   afterAll(async () => {
-    await mysqlPool.end();
+    await mySql.connection.end();
   });
 });
